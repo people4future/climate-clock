@@ -10,12 +10,9 @@ class Countobject():
 
         # Timer fuer Infoanzeige
         # Zaehlt unabhaengig von Uhrzeit, da beliebige Intervalle moeglich sein sollen
-        self.timer = 0
+        self.timer = time()
+        self.mode = "clock"
         self.position = display_size
-
-        # Variable speichert Zeitpunkt des naechsaten Aufrufs relativ zur exakten Startzeit (Nanosekundengenau)
-        # Durch Hochzaehlung dieses Wertes im Loop kann eine exakte Sleep-Zeit (abzgl. der Rechenzeit) errechnet werdem
-        self.nexttime = time()
         
         #config.ini in gleichem Ordner oeffnen und Parameter als Instanzvariablen speichern
         with open("config.ini","r",encoding="utf-8") as ini_file:
@@ -63,19 +60,24 @@ class Countobject():
         if t != False:
             
             # Info-Text entsprechend der Konfiguration alle x Sekunden fuer y Sekunden einblenden
-            if(self.timer + self.info_duration > self.info_freq):
-                ret_text = [self.info_text, self.position - self.timer]
-            else:
-                ret_text = [str(t[0]) + "J." + str(t[1]) + "T." + self.to_digit(t[2]) + ":" + self.to_digit(t[3]) + ":" + self.to_digit(t[4]),0]
+            ret_text = [str(t[0]) + "J." + str(t[1]) + "T." + self.to_digit(t[2]) + ":" + self.to_digit(t[3]) + ":" + self.to_digit(t[4]),0]
 
-            if(self.timer < self.info_freq):
-                self.timer = self.timer+1
+            if(self.mode == "info"):
+                if(time() > self.timer + self.info_duration):
+                    self.mode = "clock"
+                    self.timer = time()
+                else:
+                    self.position = self.position - 1
+                    ret_text = [self.info_text, self.position]                    
             else:
-                self.timer = 0
+                if(time() > self.timer + self.clock_duration):
+                    self.mode = "info"
+                    self.timer = time()
+                    self.position = 256
 
             # Exakte Sleeptime errechnen (Startzeit + 1 Sek. abzgl. Rechenzeit)
-            self.nexttime += 1
-            self.sleeptime = self.nexttime - time()
+            #self.nexttime += 1
+            #self.sleeptime = self.nexttime - time()
 
         else:
             ret_text = self.text_failed

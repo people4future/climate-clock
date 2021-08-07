@@ -34,7 +34,7 @@ class RunText(SampleBase):
 
             # Sleeptime aus Zaehlobjekt anfragen (damit Zeit nach Verfehlen des Ziel veraendert werden kann)
             #sleep(self.countobject.sleeptime)
-            sleep(0.02)
+            sleep(0.01)
 
         offscreen_canvas.Clear()
         len = graphics.DrawText(offscreen_canvas, font, pos, vert, textColor, display_text)
