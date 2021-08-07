@@ -1,0 +1,83 @@
+
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from time import time
+# Falls noch nicht vohanden: bei Installation dieses Modul herunterladen mit
+# pip install python-dateutil
+
+class Countobject():
+    def __init__(self):
+
+        # Timer fuer Infoanzeige
+        # Zaehlt unabhaengig von Uhrzeit, da beliebige Intervalle moeglich sein sollen
+        self.timer = 0
+
+        # Variable speichert Zeitpunkt des naechsaten Aufrufs relativ zur exakten Startzeit (Nanosekundengenau)
+        # Durch Hochzaehlung dieses Wertes im Loop kann eine exakte Sleep-Zeit (abzgl. der Rechenzeit) errechnet werdem
+        self.nexttime = time()
+        
+        #config.ini in gleichem Ordner oeffnen und Parameter als Instanzvariablen speichern
+        with open("config.ini","r",encoding="utf-8") as ini_file:
+            arr = ini_file.read().split("\n")
+            for line in arr:
+                if(line != "" and not line.startswith(";")):
+                    tup = line.split("=")
+                    tup[0] = tup[0].strip()
+                    tup[1] = tup[1].strip()
+                    if(tup[1].isdigit()):
+                        tup[1] = int(tup[1])
+                    setattr(self,tup[0],tup[1])        
+        
+
+    # Fuehrt Zeit-Subtraktion aus.
+    # Rueckgabe ist Zeit-Array ([J,T,H,Min,S]) oder False, falls Zeit abgelaufen ist
+    def get_time(self):
+        t0 = datetime.now()
+        t1 = datetime.strptime(self.fail_date,"%Y-%m-%d %H:%M:%S")
+
+        #Zeitunterschied berechnen
+        delta = relativedelta(t1,t0)
+        days = (t1-t0).days%365
+        
+        ret_val = ""
+        if(int((t1-t0).total_seconds()) > 0):
+            ret_val = delta.years, days, delta.hours, delta.minutes, delta.seconds,(t1-t0).total_seconds()
+        else:
+            ret_val = False
+        
+        return(ret_val)
+
+    # Wandelt integer in Zeitziffer-String um
+    def to_digit(self,num):
+        if(num < 10):
+            return("0" + str(num))
+        else:
+            return str(num)
+
+    # Hauptfunktion der Klasse
+    # Startet Berechnung, setzt ggf. Sleeptime und gibt anzuzeigenden Text zureuck
+    def count(self):
+        ret_text = ""
+        t = self.get_time()
+        if t != False:
+            
+            # Info-Text entsprechend der Konfiguration alle x Sekunden fuer y Sekunden einblenden
+            if(self.timer + self.info_duration > self.info_freq):
+                ret_text = self.info_text
+            else:
+                ret_text = str(t[0]) + "J." + str(t[1]) + "T." + self.to_digit(t[2]) + ":" + self.to_digit(t[3]) + ":" + self.to_digit(t[4])
+
+            if(self.timer < self.info_freq):
+                self.timer = self.timer+1
+            else:
+                self.timer = 0
+
+            # Exakte Sleeptime errechnen (Startzeit + 1 Sek. abzgl. Rechenzeit)
+            self.nexttime += 1
+            self.sleeptime = self.nexttime - time()
+
+        else:
+            ret_text = self.text_failed
+            self.sleeptime = self.sleeptime_exp
+            
+        return ret_text
