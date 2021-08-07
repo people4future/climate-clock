@@ -17,3 +17,7 @@ info_freq=20
 
 ; Dauer (in Sek), die der Infotext angezeigt wird
 info_duration=4
+
+; Font location
+font=fonts/helv.bdf
+
