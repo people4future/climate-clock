@@ -13,10 +13,10 @@ sleeptime_exp=600
 info_text=Verbleibende Zeit für 1,5°
 
 ; Haeufigkeit (alle x Sekunden), mit der Infotext eingeblendet wird
-info_freq=20
+clock_duration=10
 
 ; Dauer (in Sek), die der Infotext angezeigt wird
-info_duration=4
+info_duration=20
 
 ; Font location
 font=fonts/helv.bdf
