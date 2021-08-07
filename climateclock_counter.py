@@ -55,9 +55,9 @@ class Countobject():
     # Wandelt integer in Zeitziffer-String um
     def to_digit2(self,num):
         if(num < 10):
-            return("00" + str(num))
+            return("  " + str(num))
         elif(num < 100):
-            return("0" + str(num))
+            return(" " + str(num))
         else:
             return str(num)
 
@@ -69,7 +69,8 @@ class Countobject():
         if t != False:
             
             # Info-Text entsprechend der Konfiguration alle x Sekunden fuer y Sekunden einblenden
-            ret_text = [str(t[0]) + "J. " + self.to_digit2(t[1]) + "T. " + self.to_digit(t[2]) + ":" + self.to_digit(t[3]) + ":" + self.to_digit(t[4]),0]
+            clock_text = str(t[0]) + "J. " + self.to_digit2(t[1]) + "T. " + self.to_digit(t[2]) + ":" + self.to_digit(t[3]) + ":" + self.to_digit(t[4])
+            ret_text = [clock_text, 5]
 
             current_time = time()
             if(self.mode == "info"):
@@ -78,7 +79,7 @@ class Countobject():
                     self.timer = current_time
                 else:
                     self.position = self.position - 1
-                    ret_text = [self.info_text, self.position]
+                    ret_text = [self.info_text + " " + clock_text, self.position]
             else:
                 if(current_time > self.timer + self.clock_duration):
                     self.mode = "info"

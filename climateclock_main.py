@@ -21,7 +21,7 @@ class RunText(SampleBase):
         font.LoadFont(self.countobject.font)
         textColor = graphics.Color(200, 200, 0)
         pos = 0
-        vert = 30
+        vert = 27
 
         while True:
             # Unser Zaehlobjekt anfragen
