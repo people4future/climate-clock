@@ -52,6 +52,15 @@ class Countobject():
         else:
             return str(num)
 
+    # Wandelt integer in Zeitziffer-String um
+    def to_digit2(self,num):
+        if(num < 10):
+            return("00" + str(num))
+        elif(num < 100):
+            return("0" + str(num))
+        else:
+            return str(num)
+
     # Hauptfunktion der Klasse
     # Startet Berechnung, setzt ggf. Sleeptime und gibt anzuzeigenden Text zureuck
     def count(self):
@@ -60,19 +69,20 @@ class Countobject():
         if t != False:
             
             # Info-Text entsprechend der Konfiguration alle x Sekunden fuer y Sekunden einblenden
-            ret_text = [str(t[0]) + "J." + str(t[1]) + "T." + self.to_digit(t[2]) + ":" + self.to_digit(t[3]) + ":" + self.to_digit(t[4]),0]
+            ret_text = [str(t[0]) + "J. " + self.to_digit2(t[1]) + "T. " + self.to_digit(t[2]) + ":" + self.to_digit(t[3]) + ":" + self.to_digit(t[4]),0]
 
+            current_time = time()
             if(self.mode == "info"):
-                if(time() > self.timer + self.info_duration):
+                if(current_time > self.timer + self.info_duration):
                     self.mode = "clock"
-                    self.timer = time()
+                    self.timer = current_time
                 else:
                     self.position = self.position - 1
-                    ret_text = [self.info_text, self.position]                    
+                    ret_text = [self.info_text, self.position]
             else:
-                if(time() > self.timer + self.clock_duration):
+                if(current_time > self.timer + self.clock_duration):
                     self.mode = "info"
-                    self.timer = time()
+                    self.timer = current_time
                     self.position = 256
 
             # Exakte Sleeptime errechnen (Startzeit + 1 Sek. abzgl. Rechenzeit)
