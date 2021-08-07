@@ -6,11 +6,12 @@ from time import time
 # pip install python-dateutil
 
 class Countobject():
-    def __init__(self):
+    def __init__(self,display_size):
 
         # Timer fuer Infoanzeige
         # Zaehlt unabhaengig von Uhrzeit, da beliebige Intervalle moeglich sein sollen
         self.timer = 0
+        self.position = display_size
 
         # Variable speichert Zeitpunkt des naechsaten Aufrufs relativ zur exakten Startzeit (Nanosekundengenau)
         # Durch Hochzaehlung dieses Wertes im Loop kann eine exakte Sleep-Zeit (abzgl. der Rechenzeit) errechnet werdem
@@ -63,9 +64,9 @@ class Countobject():
             
             # Info-Text entsprechend der Konfiguration alle x Sekunden fuer y Sekunden einblenden
             if(self.timer + self.info_duration > self.info_freq):
-                ret_text = self.info_text
+                ret_text = [self.info_text, display_size - self.timer*5]
             else:
-                ret_text = str(t[0]) + "J." + str(t[1]) + "T." + self.to_digit(t[2]) + ":" + self.to_digit(t[3]) + ":" + self.to_digit(t[4])
+                ret_text = [str(t[0]) + "J." + str(t[1]) + "T." + self.to_digit(t[2]) + ":" + self.to_digit(t[3]) + ":" + self.to_digit(t[4]),0]
 
             if(self.timer < self.info_freq):
                 self.timer = self.timer+1

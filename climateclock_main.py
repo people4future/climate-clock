@@ -28,7 +28,7 @@ class RunText(SampleBase):
             display_text = self.countobject.count()
             
             offscreen_canvas.Clear()
-            len = graphics.DrawText(offscreen_canvas, font, pos, vert, textColor, display_text)
+            len = graphics.DrawText(offscreen_canvas, font, display_text[1], vert, textColor, display_text[0])
 
             offscreen_canvas = self.matrix.SwapOnVSync(offscreen_canvas)
 
