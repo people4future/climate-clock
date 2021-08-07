@@ -64,7 +64,7 @@ class Countobject():
             
             # Info-Text entsprechend der Konfiguration alle x Sekunden fuer y Sekunden einblenden
             if(self.timer + self.info_duration > self.info_freq):
-                ret_text = [self.info_text, display_size - self.timer*5]
+                ret_text = [self.info_text, self.position - self.timer]
             else:
                 ret_text = [str(t[0]) + "J." + str(t[1]) + "T." + self.to_digit(t[2]) + ":" + self.to_digit(t[3]) + ":" + self.to_digit(t[4]),0]
 

@@ -33,7 +33,8 @@ class RunText(SampleBase):
             offscreen_canvas = self.matrix.SwapOnVSync(offscreen_canvas)
 
             # Sleeptime aus Zaehlobjekt anfragen (damit Zeit nach Verfehlen des Ziel veraendert werden kann)
-            sleep(self.countobject.sleeptime)
+            #sleep(self.countobject.sleeptime)
+            sleep(0.02)
 
         offscreen_canvas.Clear()
         len = graphics.DrawText(offscreen_canvas, font, pos, vert, textColor, display_text)
