@@ -13,7 +13,7 @@ class RunText(SampleBase):
         self.parser.add_argument("-t", "--text", help="The text to scroll on the RGB LED panel", default="Hello world!")
 
         # Unser Zaehlobjekt anlegen
-        self.countobject = Countobject()
+        self.countobject = Countobject(256)
 
     def run(self):
         offscreen_canvas = self.matrix.CreateFrameCanvas()
