@@ -6,18 +6,17 @@ from dateutil.relativedelta import relativedelta
 # pip install python-dateutil
 
 class Countobject():
-    def __init__(self):
+    def __init__(self,display_size):
         
         # Timer fuer Infoanzeige
         # Zaehlt unabhaengig von Uhrzeit, da beliebige Intervalle moeglich sein sollen
-        self.timer = 0
-
-        # Variable speichert Zeitpunkt des naechsaten Aufrufs relativ zur exakten Startzeit (Nanosekundengenau)
-        # Durch Hochzaehlung dieses Wertes im Loop kann eine exakte Sleep-Zeit (abzgl. der Rechenzeit) errechnet werdem
-        self.nexttime = time()
+        self.timer = time()
+        self.start_time = time()
+        self.mode = "clock"
+        self.position = display_size
         
         #config.ini in gleichem Ordner oeffnen und Parameter als Instanzvariablen speichern
-        with open("config.ini","r",encoding="utf-8") as ini_file:
+        with open("config.ini.template","r",encoding="utf-8") as ini_file:
             arr = ini_file.read().split("\n")
             for line in arr:
                 if(line != "" and not line.startswith(";")):
@@ -39,9 +38,11 @@ class Countobject():
 
     # Hilfsfunktion fuer Test: Zaehlt Zeit relativ zu Startzeitpunkt sekundenweise herunter
     def count_time_4test(self):
-        
-        if(self.test_t0.second <58):
-            self.test_t0 = self.test_t0.replace(second=self.test_t0.second+1)
+
+        delta = int(round(time() - self.start_time, 0))
+        self.start_time = self.start_time + delta
+        if(self.test_t0.second + delta <= 59):
+            self.test_t0 = self.test_t0.replace(second=self.test_t0.second+delta)
         else:
             self.test_t0 = self.test_t0.replace(hour=self.test_t0.hour + 1)
             self.test_t0 = self.test_t0.replace(minute=0)
@@ -73,6 +74,15 @@ class Countobject():
             return("0" + str(num))
         else:
             return str(num)
+
+    # Wandelt integer in Zeitziffer-String um
+    def to_digit2(self,num):
+        if(num < 10):
+            return("  " + str(num))
+        elif(num < 100):
+            return(" " + str(num))
+        else:
+            return str(num)
         
     # Hauptfunktion der Klasse
     # Startet Berechnung, setzt ggf. Sleeptime und gibt anzuzeigenden Text zureuck
@@ -83,23 +93,26 @@ class Countobject():
         if t != False:
 
             # Info-Text entsprechend der Konfiguration alle x Sekunden fuer y Sekunden einblenden
-            if(self.timer + self.info_duration > self.info_freq):
-                ret_text = self.info_text
+            clock_text = str(t[0]) + "J. " + self.to_digit2(t[1]) + "T. " + self.to_digit(t[2]) + ":" + self.to_digit(t[3]) + ":" + self.to_digit(t[4])
+            ret_text = [clock_text, 5]
+
+            current_time = time()
+            if(self.mode == "info"):
+                if(current_time > self.timer + self.info_duration):
+                    self.mode = "clock"
+                    self.timer = current_time
+                else:
+                    self.position = self.position - 1
+                    ret_text = [self.info_text + " " + clock_text, self.position]
             else:
-                ret_text = str(t[0]) + "J." + str(t[1]) + "T." + self.to_digit(t[2]) + ":" + self.to_digit(t[3]) + ":" + self.to_digit(t[4])
+                if(current_time > self.timer + self.clock_duration):
+                    self.mode = "info"
+                    self.timer = current_time
+                    self.position = 256
             self.count_time_4test()
 
-            if(self.timer < self.info_freq):
-                self.timer = self.timer+1
-            else:
-                self.timer = 0
-
-            # Exakte Sleeptime errechnen (Startzeit + 1 Sek. abzgl. Rechenzeit)
-            self.nexttime += 1
-            self.sleeptime = self.nexttime - time()
             
         else:
-            ret_text = self.text_failed
-            self.sleeptime = self.sleeptime_exp
+            ret_text = [self.text_failed,5]
 
         return ret_text

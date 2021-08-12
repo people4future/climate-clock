@@ -10,9 +10,9 @@ sleeptime_exp=600
 
 ; Konfiguration Infotext
 ;Infotext (wird intervallbasiert eingeblendet)
-info_text=Verbleibende Zeit für 1,5°
+info_text=Verbleibende Zeit für 1,5°-Ziel
 
-; Haeufigkeit (alle x Sekunden), mit der Infotext eingeblendet wird
+; Dauer (in Sek), die die Uhr angezeigt wird
 clock_duration=10
 
 ; Dauer (in Sek), die der Infotext angezeigt wird
