@@ -15,7 +15,7 @@ class Countobject():
         self.position = display_size
         
         #config.ini in gleichem Ordner oeffnen und Parameter als Instanzvariablen speichern
-        with open("config.ini","r",encoding="utf-8") as ini_file:
+        with open("config.ini.template","r",encoding="utf-8") as ini_file:
             arr = ini_file.read().split("\n")
             for line in arr:
                 if(line != "" and not line.startswith(";")):
