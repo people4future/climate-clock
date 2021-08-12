@@ -5,5 +5,5 @@ from climateclock_counter_simulate import Countobject
 countobject = Countobject(256)
 
 while True:
-    print(countobject.count()[0])
-    sleep(0.5)
+    print(countobject.count())
+    sleep(0.01)
