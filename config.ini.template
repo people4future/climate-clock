@@ -21,3 +21,8 @@ info_duration=20
 ; Font location
 font=fonts/helv.bdf
 
+; Helligkeitswert fuer tagsueber
+light_intensity_day = 100
+
+; Helligkeitswert fuer nachts
+light_intensity_night = 54
