@@ -1,4 +1,4 @@
-
+import re
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from time import time
@@ -16,8 +16,8 @@ class Countobject():
                     tup = line.split("=")
                     tup[0] = tup[0].strip()
                     tup[1] = tup[1].strip()
-                    if(tup[1].isdigit()):
-                        tup[1] = int(tup[1])
+                    if(re.match(r"^\d+\.*\d*$",tup[1])):
+                        tup[1] = float(tup[1])
                     setattr(self,tup[0],tup[1])
         # Timer fuer Infoanzeige
         # Zaehlt unabhaengig von Uhrzeit, da beliebige Intervalle moeglich sein sollen
@@ -108,7 +108,7 @@ class Countobject():
             self.light_intensity = self.light_intensity_day
         else:
             self.light_intensity = self.light_intensity_night
-
+        
         ret_val = ""
         t = self.get_time()
         if t != False:

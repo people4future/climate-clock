@@ -26,7 +26,7 @@ class RunText(SampleBase):
         while True:
             # Unser Zaehlobjekt anfragen
             display_text = self.countobject.count()
-            
+            textColor = graphics.Color(int(255*display_text[2]),int(255*display_text[2]),int(255*display_text[2]))            
             offscreen_canvas.Clear()
             len = graphics.DrawText(offscreen_canvas, font, display_text[1], vert, textColor, display_text[0])
 
