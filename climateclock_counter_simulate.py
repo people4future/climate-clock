@@ -24,6 +24,7 @@ class Countobject():
         self.timer = time()
         self.start_time = time()
         self.mode = "clock"
+        self.curr_frame = 0
         self.position = display_size
         self.daylight = [[0,0,0],[0,0,0]]
         self.d_l_time_updated = time()
@@ -143,17 +144,19 @@ class Countobject():
 
             #current_time = time()
             if(self.mode == "info"):
-                if(current_time > self.timer + self.info_duration):
+                if(self.curr_frame > self.info_duration):
                     self.mode = "clock"
                     self.timer = current_time
                 else:
-                    self.position = self.position - 1
+                    self.position -= 1
+                    self.curr_frame += 1
                     ret_val = [self.info_text + " " + clock_text, self.position, self.light_intensity]
             else:
                 if(current_time > self.timer + self.clock_duration):
                     self.mode = "info"
                     self.timer = current_time
                     self.position = 256
+                    self.curr_frame = 0
                     
             self.count_time_4test()
 
