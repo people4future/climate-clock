@@ -1,9 +1,44 @@
 import re
+import os
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from time import time
+from bdflib import reader
 # Falls noch nicht vohanden: bei Installation dieses Modul herunterladen mit
 # pip install python-dateutil
+
+# Wandelt integer in Zeitziffer-String um
+def to_digit(num):
+    if(num < 10):
+        return("0" + str(num))
+    else:
+        return str(num)
+
+# Wandelt integer in Zeitziffer-String um
+def to_digit2(num):
+    if(num < 10):
+        return("  " + str(num))
+    elif(num < 100):
+        return(" " + str(num))
+    else:
+        return str(num)
+
+def calculate_text_width(text):
+    text_width = 0
+    fontdir = os.path.join(os.getcwd(),"fonts","texgyreheros-bold-22.bdf")
+    with open(fontdir, "rb") as handle:
+        font = reader.read_bdf(handle)
+    for char in text:
+        font_width = font[ord(char)].bbW
+
+        #Notloesung, da Leerzeichen, Tabs, etc nicht korrekt gelesen werden
+        if(font_width == 0):
+            font_width = 5
+            
+        text_width += font_width
+    return text_width
+        
+
 
 class Countobject():
     def __init__(self,display_size):
@@ -23,6 +58,7 @@ class Countobject():
         # Zaehlt unabhaengig von Uhrzeit, da beliebige Intervalle moeglich sein sollen
         self.timer = time()
         self.mode = "clock"
+        self.curr_text_width = calculate_text_width(self.info_text)
         self.curr_frame = 0
         self.position = display_size
         self.daylight = [[0,0,0],[0,0,0]]
@@ -66,21 +102,6 @@ class Countobject():
         
         return(ret_val)
 
-    # Wandelt integer in Zeitziffer-String um
-    def to_digit(self,num):
-        if(num < 10):
-            return("0" + str(num))
-        else:
-            return str(num)
-
-    # Wandelt integer in Zeitziffer-String um
-    def to_digit2(self,num):
-        if(num < 10):
-            return("  " + str(num))
-        elif(num < 100):
-            return(" " + str(num))
-        else:
-            return str(num)
 
     # Hauptfunktion der Klasse
     # Startet Berechnung, setzt ggf. Sleeptime und gibt anzuzeigenden Text zureuck
@@ -115,12 +136,12 @@ class Countobject():
         if t != False:
             
             # Info-Text entsprechend der Konfiguration alle x Sekunden fuer y Sekunden einblenden
-            clock_text = str(t[0]) + "J. " + self.to_digit2(t[1]) + "T. " + self.to_digit(t[2]) + ":" + self.to_digit(t[3]) + ":" + self.to_digit(t[4])
+            clock_text = str(t[0]) + "J. " + to_digit2(t[1]) + "T. " + to_digit(t[2]) + ":" + to_digit(t[3]) + ":" + to_digit(t[4])
             ret_val = [clock_text, 5, self.light_intensity]
 
             #current_time = time()
             if(self.mode == "info"):
-                if(self.curr_frame > self.info_duration):
+                if(self.curr_frame > self.curr_text_width):
                     self.mode = "clock"
                     self.timer = current_time
                 else:

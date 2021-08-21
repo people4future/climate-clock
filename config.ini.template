@@ -17,8 +17,8 @@ clock_duration=10
 
 ; Dauer (in Sek), die der Infotext angezeigt wird
 ;info_duration=20.4
-; neu: in frames zaehlen
-info_duration=1200
+; deprecated: wird zukuenftig ueber Pixesbreite des Textes berechnet
+;info_duration=1200
 
 ; Font location
 font=fonts/texgyreheros-bold-22.bdf
