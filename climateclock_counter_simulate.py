@@ -4,8 +4,9 @@ from datetime import datetime
 from time import time
 from bdflib import reader
 from dateutil.relativedelta import relativedelta
-# Falls noch nicht vohanden: bei Installation dieses Modul herunterladen mit
-# pip install python-dateutil
+# Falls noch nicht vohanden: bei Installation dieser Module herunterladen mit
+# pip3 install python-dateutil
+# pip3 install bdflib
 
 # Wandelt integer in Zeitziffer-String um
 def to_digit(num):
