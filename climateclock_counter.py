@@ -35,11 +35,11 @@ def calculate_text_width(text):
 
         #Notloesung, da Leerzeichen, Tabs, etc nicht korrekt gelesen werden
         if(font_width == 0):
-            font_width = 5
-            
+            font_width = 9
+
+        font_width +=2
         text_width += font_width
     return text_width
-        
 
 
 class Countobject():
@@ -60,19 +60,20 @@ class Countobject():
         # Zaehlt unabhaengig von Uhrzeit, da beliebige Intervalle moeglich sein sollen
         self.timer = time()
         self.mode = "clock"
-        self.curr_text_width = calculate_text_width(self.info_text)
+        self.curr_text_width = calculate_text_width(self.info_text) + display_size+16
         self.curr_frame = 0
         self.position = display_size
         self.daylight = [[0,0,0],[0,0,0]]
         self.d_l_time_updated = time()
         self.light_intensity = self.light_intensity_night
-        
+
     def get_daylight_times(self,datetime_obj):
         with open("daylight_times.csv","r") as f:
             c = f.read()
         lines = c.split("\n")
         for l in lines:
             values = l.split(";")
+
             if(str(datetime_obj.month) == values[1] and str(datetime_obj.day) == values[0]):
                 self.daylight = []
                 self.daylight.append(values[2].split(":"))
@@ -80,12 +81,12 @@ class Countobject():
 
         for i in range(len(self.daylight[0])):
             self.daylight[0][i] = int(self.daylight[0][i])
-            
+
         for i in range(len(self.daylight[1])):
             self.daylight[1][i] = int(self.daylight[1][i])
 
 
-        
+
     # Fuehrt Zeit-Subtraktion aus.
     # Rueckgabe ist Zeit-Array ([J,T,H,Min,S]) oder False, falls Zeit abgelaufen ist
     def get_time(self):
@@ -95,13 +96,13 @@ class Countobject():
         #Zeitunterschied berechnen
         delta = relativedelta(t1,t0)
         days = (t1-t0).days%365
-        
+
         ret_val = ""
         if(int((t1-t0).total_seconds()) > 0):
             ret_val = delta.years, days, delta.hours, delta.minutes, delta.seconds,(t1-t0).total_seconds()
         else:
             ret_val = False
-        
+
         return(ret_val)
 
 
@@ -158,6 +159,6 @@ class Countobject():
                     self.curr_frame = 0
 
         else:
-            ret_val = [self.text_failed,5, self.light_intensity]
+            ret_val = [self.text_failed,9, self.light_intensity]
             
         return ret_val
