@@ -3,11 +3,16 @@ import os
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from time import time
+from time import localtime
 from bdflib import reader
 # Falls noch nicht vohanden: bei Installation dieser Module herunterladen mit
 # pip3 install python-dateutil
 # pip3 install bdflib
 
+#rechnet Sekunden des aktuellen Tages in Lokalzeit aus
+def get_local_time():
+    local_time = localtime()
+    return (3600*local_time.tm_hour) + (60*local_time.tm_min) + local_time.tm_sec
 
 # Wandelt integer in Zeitziffer-String um
 def to_digit(num):
@@ -58,13 +63,13 @@ class Countobject():
                     setattr(self,tup[0],tup[1])
         # Timer fuer Infoanzeige
         # Zaehlt unabhaengig von Uhrzeit, da beliebige Intervalle moeglich sein sollen
-        self.timer = time()
+        self.timer = get_local_time()
         self.mode = "clock"
         self.curr_text_width = calculate_text_width(self.info_text) + display_size+16
         self.curr_frame = 0
         self.position = display_size
         self.daylight = [[0,0,0],[0,0,0]]
-        self.d_l_time_updated = time()
+        self.d_l_time_updated = 0
         self.light_intensity = self.light_intensity_night
 
     def get_daylight_times(self,datetime_obj):
@@ -73,7 +78,6 @@ class Countobject():
         lines = c.split("\n")
         for l in lines:
             values = l.split(";")
-
             if(str(datetime_obj.month) == values[1] and str(datetime_obj.day) == values[0]):
                 self.daylight = []
                 self.daylight.append(values[2].split(":"))
@@ -84,6 +88,7 @@ class Countobject():
 
         for i in range(len(self.daylight[1])):
             self.daylight[1][i] = int(self.daylight[1][i])
+
 
 
 
@@ -109,31 +114,23 @@ class Countobject():
     # Hauptfunktion der Klasse
     # Startet Berechnung, setzt ggf. Sleeptime und gibt anzuzeigenden Text zureuck
     def count(self):
-        current_time = time()
-        
+        current_time = get_local_time()
         # 1x am Tag (um 0 Uhr): Sonnenaufgangs- und -untergangszeit aktualisieren
-        #if(int(round(current_time,0))%86400 == 0):
-
+        #if(current_time == 0 and (time() - self.d_l_time_updated) >= 86400):
         #Fuer Test: alle 10 Sekunden neu einlesen
-        if(int(round(current_time,0))%86400 == int(round(self.d_l_time_updated,0)%86400) + 10):
-
-            # Pro Tag nur 1x Datei lesen
-            #if((current_time - self.d_l_time_updated) >= 86400):
-            
-            #Fuer Test: alle 10 Sekunden neu einlesen
-            if((current_time - self.d_l_time_updated) >= 10):
-                self.get_daylight_times(datetime.now())
-                self.d_l_time_updated = time()
+        if(current_time%10 == 0 and (time() - self.d_l_time_updated) >= 10):
+            self.get_daylight_times(datetime.now())
+            self.d_l_time_updated = time()
 
         # Helligkeit auf Basis der Tageszeit berechnen:
         curr_sunset = (self.daylight[0][0] * 3600) +  (self.daylight[0][1] * 60) + self.daylight[0][2]
         curr_sundown = (self.daylight[1][0] * 3600) +  (self.daylight[1][1] * 60) + self.daylight[1][2]
 
-        if(current_time%86400 > curr_sunset and current_time%86400 < curr_sundown):
+        if(current_time > curr_sunset and current_time < curr_sundown):
             self.light_intensity = self.light_intensity_day
         else:
             self.light_intensity = self.light_intensity_night
-        
+
         ret_val = ""
         t = self.get_time()
         if t != False:
