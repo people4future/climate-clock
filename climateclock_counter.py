@@ -40,10 +40,12 @@ def calculate_text_width(text):
 
         #Notloesung, da Leerzeichen, Tabs, etc nicht korrekt gelesen werden
         if(font_width == 0):
-            font_width = 9
+            font_width = 10
 
+        #jeder Buchstabe enthaelt jeweils 1px davor und danach
         font_width +=2
         text_width += font_width
+
     return text_width
 
 
@@ -57,7 +59,7 @@ class Countobject():
                 if(line != "" and not line.startswith(";")):
                     tup = line.split("=")
                     tup[0] = tup[0].strip()
-                    tup[1] = tup[1].strip()
+
                     if(re.match(r"^\d+\.*\d*$",tup[1])):
                         tup[1] = float(tup[1])
                     setattr(self,tup[0],tup[1])
@@ -144,13 +146,14 @@ class Countobject():
 
             #current_time = time()
             if(self.mode == "info"):
+
                 if(self.curr_frame > self.curr_text_width):
                     self.mode = "clock"
                     self.timer = current_time
                 else:
                     self.position -= 1
                     self.curr_frame += 1
-                    ret_val = [self.info_text + " " + clock_text, self.position, self.light_intensity, self.light_color]
+                    ret_val = [self.info_text + "  " + clock_text, self.position, self.light_intensity, self.light_color]
             else:
                 if(current_time > self.timer + self.clock_duration):
                     self.mode = "info"
@@ -160,5 +163,5 @@ class Countobject():
 
         else:
             ret_val = [self.text_failed,9, self.light_intensity, self.light_color]
-            
+
         return ret_val

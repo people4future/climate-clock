@@ -20,12 +20,12 @@ class RunText(SampleBase):
         font = graphics.Font()
         font.LoadFont(self.countobject.font)
         pos = 0
-        vert = 27
+        vert = 26
 
         while True:
             # Unser Zaehlobjekt anfragen
             display_text = self.countobject.count()
-            textColor = graphics.Color(int(int(display_text[3][0])*display_text[2]),int((int(display_text[3][1])*display_text[2]),int((int(display_text[3][2])*display_text[2]))            
+            textColor = graphics.Color(int(int(display_text[3][0])*display_text[2]),int(int(display_text[3][1])*display_text[2]),int(int(display_text[3][2])*display_text[2]))
             offscreen_canvas.Clear()
             len = graphics.DrawText(offscreen_canvas, font, display_text[1], vert, textColor, display_text[0])
 
@@ -33,7 +33,7 @@ class RunText(SampleBase):
 
             # Sleeptime aus Zaehlobjekt anfragen (damit Zeit nach Verfehlen des Ziel veraendert werden kann)
             #sleep(self.countobject.sleeptime)
-            sleep(0.02)
+            sleep(0.015)
 
         offscreen_canvas.Clear()
         len = graphics.DrawText(offscreen_canvas, font, pos, vert, textColor, display_text)
