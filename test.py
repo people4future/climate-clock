@@ -6,4 +6,4 @@ countobject = Countobject(256)
 
 while True:
     print(countobject.count())
-    sleep(0.01)
+    sleep(0.02)

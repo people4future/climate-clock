@@ -10,19 +10,23 @@ sleeptime_exp=600
 
 ; Konfiguration Infotext
 ;Infotext (wird intervallbasiert eingeblendet)
-info_text=Verbleibende Zeit für 1,5°-Ziel
+info_text=Verbleibende Zeit für die Einhaltung des 1,5 °C-Ziels.  
 
 ; Dauer (in Sek), die die Uhr angezeigt wird
 clock_duration=10
 
 ; Dauer (in Sek), die der Infotext angezeigt wird
-info_duration=12.0
+;info_duration=20.4
+; deprecated: wird zukuenftig ueber Pixesbreite des Textes berechnet
+;info_duration=1200
 
 ; Font location
 font=fonts/texgyreheros-bold-22.bdf
 
 ; Helligkeitswert fuer tagsueber
-light_intensity_day = 1
+light_intensity_day=1
+light_color_day =255,255,255
 
 ; Helligkeitswert fuer nachts
-light_intensity_night = 0.5
+light_intensity_night=0.5
+light_color_night =255,0,0
