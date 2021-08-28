@@ -25,6 +25,8 @@ font=fonts/texgyreheros-bold-22.bdf
 
 ; Helligkeitswert fuer tagsueber
 light_intensity_day = 1
+light_color_day = 255,255,255
 
 ; Helligkeitswert fuer nachts
 light_intensity_night = 0.5
+light_color_night = 255,0,0

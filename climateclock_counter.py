@@ -71,6 +71,7 @@ class Countobject():
         self.daylight = [[0,0,0],[0,0,0]]
         self.d_l_time_updated = 0
         self.light_intensity = self.light_intensity_night
+        self.light_color = self.light_color_night.split(",")
 
     def get_daylight_times(self,datetime_obj):
         with open("daylight_times.csv","r") as f:
@@ -128,8 +129,10 @@ class Countobject():
 
         if(current_time > curr_sunset and current_time < curr_sundown):
             self.light_intensity = self.light_intensity_day
+            self.light_color = self.light_color_day.split(",")
         else:
             self.light_intensity = self.light_intensity_night
+            self.light_color = self.light_color_night.split(",")
 
         ret_val = ""
         t = self.get_time()
@@ -137,7 +140,7 @@ class Countobject():
             
             # Info-Text entsprechend der Konfiguration alle x Sekunden fuer y Sekunden einblenden
             clock_text = str(t[0]) + "J. " + to_digit2(t[1]) + "T. " + to_digit(t[2]) + ":" + to_digit(t[3]) + ":" + to_digit(t[4])
-            ret_val = [clock_text, 5, self.light_intensity]
+            ret_val = [clock_text, 5, self.light_intensity, self.light_color]
 
             #current_time = time()
             if(self.mode == "info"):
@@ -147,7 +150,7 @@ class Countobject():
                 else:
                     self.position -= 1
                     self.curr_frame += 1
-                    ret_val = [self.info_text + " " + clock_text, self.position, self.light_intensity]
+                    ret_val = [self.info_text + " " + clock_text, self.position, self.light_intensity, self.light_color]
             else:
                 if(current_time > self.timer + self.clock_duration):
                     self.mode = "info"
@@ -156,6 +159,6 @@ class Countobject():
                     self.curr_frame = 0
 
         else:
-            ret_val = [self.text_failed,9, self.light_intensity]
+            ret_val = [self.text_failed,9, self.light_intensity, self.light_color]
             
         return ret_val
