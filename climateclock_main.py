@@ -6,6 +6,7 @@ from time import sleep
 from climateclock_counter import Countobject
 # oder zum Test 'Final Countdown':
 #from climateclock_counter_simulate import Countobject
+import imageviewer
 
 class RunText(SampleBase):
     def __init__(self, *args, **kwargs):
@@ -22,6 +23,8 @@ class RunText(SampleBase):
         pos = 0
         vert = 26
 
+        imageviewer.draw_image(self.matrix,"stripes_Klimauhr6.jpg",20)
+        #imageviewer.draw_image(self.matrix,"logo_kiel3.jpg",20)
         while True:
             # Unser Zaehlobjekt anfragen
             display_text = self.countobject.count()

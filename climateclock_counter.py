@@ -74,6 +74,7 @@ class Countobject():
         self.d_l_time_updated = 0
         self.light_intensity = self.light_intensity_night
         self.light_color = self.light_color_night.split(",")
+        self.get_daylight_times(datetime.now())
 
     def get_daylight_times(self,datetime_obj):
         with open("daylight_times.csv","r") as f:
