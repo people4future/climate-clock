@@ -1,0 +1,14 @@
+[
+	{"type":"text",
+	"content":"Verbleibende Zeit für die Einhaltung des 1,5 °C-Ziels.",
+	"cron":"* 2 *",
+	"duration":-1},
+	{"type":"text",
+	"content":"Nerviger Text 123",
+	"cron":"1 30 *",
+	"duration":-1},
+	{"type":"img",
+	"content":"img/stripes_Klimauhr6.jpg",
+	"cron":"* 1 *",
+	"duration":20}
+]
