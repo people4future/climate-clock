@@ -15,12 +15,13 @@ import os
 
 #matrix = RGBMatrix(options = options)
 
-def draw_image(matrix,img_name,sleep_time):
-    image = Image.open(os.path.join("img",img_name))
+def draw_image(matrix,img_name,opt_sleep_time):
+    image = Image.open(os.path.join(os.getcwd(),img_name))
 
     # Make image fit our screen.
     image.thumbnail((matrix.width, matrix.height), Image.ANTIALIAS)
 
     matrix.SetImage(image.convert('RGB'))
-
-    time.sleep(sleep_time)
+    if(opt_sleep_time != None):
+        time.sleep(opt_sleep_time)
+    return([False])

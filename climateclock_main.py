@@ -36,8 +36,12 @@ class RunText(SampleBase):
 
         for j in self.jobs:
             j["added"] = climateclock_util.get_local_time()
+            if(j["type"] == "text"):
+                j["text_width"] = climateclock_util.calculate_text_width(j["content"])
+
 
         self.job_list = []
+        self.job_list_updated = climateclock_util.get_local_time()
         self.job_started = climateclock_util.get_local_time()
 
     def get_daylight_times(self,datetime_obj):
@@ -87,12 +91,13 @@ class RunText(SampleBase):
         curr_sunset = 0
         curr_sundown = 0
 
-        imageviewer.draw_image(self.matrix,"stripes_Klimauhr6.jpg",20)
-        #imageviewer.draw_image(self.matrix,"logo_kiel3.jpg",20)
+        imageviewer.draw_image(self.matrix,"img/stripes_Klimauhr6.jpg",10)
+        #imageviewer.draw_image(self.matrix,"img/logo_kiel3.jpg",20)
 
         while True:
 
             current_time = climateclock_util.get_local_time()
+
             # 1x am Tag (um 0 Uhr): Sonnenaufgangs- und -untergangszeit aktualisieren
             #if(current_time == 0 and (time() - self.d_l_time_updated) >= 86400):
             #Fuer Test: alle 10 Sekunden neu einlesen
@@ -111,18 +116,26 @@ class RunText(SampleBase):
                 self.light_intensity = self.light_intensity_night
                 self.light_color = self.light_color_night.split(",")
 
-            self.update_job_list(current_time)
+            if(current_time > self.job_list_updated):
+                self.update_job_list(current_time)
+                self.job_list_updated = current_time
 
             if(len(self.job_list) > 0):
                 if(self.job_list[0]["type"] == "text"):
                     display_text = self.countobject.display_text(self.job_list[0]["content"], self.job_list[0]["text_width"], 256, current_time)
+                    textColor = graphics.Color(int(int(self.light_color[0])*self.light_intensity),int(int(self.light_color[1])*self.light_intensity),int(int(self.light_color[2])*self.light_intensity))
+                    offscreen_canvas.Clear()
+                    graphics.DrawText(offscreen_canvas, font, display_text[1], vert, textColor, display_text[0])
+
+                    offscreen_canvas = self.matrix.SwapOnVSync(offscreen_canvas)
 
                 elif(self.job_list[0]["type"] == "img"):
-                    display_text = imageviewer.draw_image(self.matrix,self.job_list[0]["content"])
-                   
+                    display_text = imageviewer.draw_image(self.matrix,self.job_list[0]["content"],None)
+
                 #Falls Job beendet oder Zeit abgelaufen: aus Jobliste loeschen
                 if(display_text[-1] == True or (self.job_list[0]["duration"] > 0 and self.job_started + self.job_list[0]["duration"] < current_time)):
                     self.job_list.pop(0)
+                    self.job_started = current_time
                 
             else:
                 #Zeit fuer duration fuer naechsten Durchlauf initialisieren
@@ -130,21 +143,17 @@ class RunText(SampleBase):
                 
                 # Unser Zaehlobjekt anfragen
                 display_text = self.countobject.count()
-            
-            # Unser Zaehlobjekt anfragen
-            #display_text = self.countobject.count(current_time)
-            textColor = graphics.Color(int(int(self.light_color[0])*self.light_intensity),int(int(self.light_color[1])*self.light_intensity),int(int(self.light_color[2])*self.light_intensity))
-            offscreen_canvas.Clear()
-            len = graphics.DrawText(offscreen_canvas, font, display_text[1], vert, textColor, display_text[0])
+                textColor = graphics.Color(int(int(self.light_color[0])*self.light_intensity),int(int(self.light_color[1])*self.light_intensity),int(int(self.light_color[2])*self.light_intensity))
+                offscreen_canvas.Clear()
+                graphics.DrawText(offscreen_canvas, font, display_text[1], vert, textColor, display_text[0])
 
-            offscreen_canvas = self.matrix.SwapOnVSync(offscreen_canvas)
+                offscreen_canvas = self.matrix.SwapOnVSync(offscreen_canvas)
 
-            # Sleeptime aus Zaehlobjekt anfragen (damit Zeit nach Verfehlen des Ziel veraendert werden kann)
-            #sleep(self.countobject.sleeptime)
             sleep(0.015)
 
         offscreen_canvas.Clear()
-        len = graphics.DrawText(offscreen_canvas, font, pos, vert, textColor, display_text)
+        #len = 
+        graphics.DrawText(offscreen_canvas, font, pos, vert, textColor, display_text)
         offscreen_canvas = self.matrix.SwapOnVSync(offscreen_canvas)
 
 # Main function

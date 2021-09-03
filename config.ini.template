@@ -6,14 +6,15 @@ fail_date=2029-07-24 12:00:00
 text_failed=Klimaziel 1,5 verfehlt
 
 ; Sleeptime nach Ablauf des Counters (Klimaziel verfehlt)
-sleeptime_exp=600
+;sleeptime_exp=600
 
 ; Konfiguration Infotext
 ;Infotext (wird intervallbasiert eingeblendet)
 info_text=Verbleibende Zeit für die Einhaltung des 1,5 °C-Ziels.  
 
 ; Dauer (in Sek), die die Uhr angezeigt wird
-clock_duration=10
+;Deprecated: Wird in Joblist definiert
+;clock_duration=10
 
 ; Dauer (in Sek), die der Infotext angezeigt wird
 ;info_duration=20.4

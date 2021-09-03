@@ -81,8 +81,11 @@ class Countobject():
     def display_text(self,text, text_width, display_size, current_time):
 
         #Performanceoptimierung moeglich: Clock nur berechnen, wenn in Anzeige
-        clock_text = self.count()[0]
-
+        if("$CLOCK$" in text):
+            text = text.replace("$CLOCK$","")
+            clock_text = self.count()[0]
+        else:
+            clock_text = ""
         #Falls Text durchgelaufen: Reset und Uhr anzeigen
         if(self.curr_frame > text_width + display_size+16):
             self.curr_frame = 0
