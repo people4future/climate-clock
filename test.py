@@ -2,10 +2,9 @@ from time import sleep
 from time import time
 from datetime import datetime
 import climateclock_util
-from climateclock_counter import Countobject
 import json
+from climateclock_counter import Countobject
 #from climateclock_counter_simulate import Countobject
-#rechnet Sekunden des aktuellen Tages in Lokalzeit aus
 
 class Test():
     def __init__(self):
@@ -33,6 +32,8 @@ class Test():
                 j["text_width"] = climateclock_util.calculate_text_width(j["content"])
 
         self.job_list = []
+        self.job_list_updated = climateclock_util.get_local_time()
+        self.job_started = climateclock_util.get_local_time()
 
     def get_daylight_times(self,datetime_obj):
         with open("daylight_times.csv","r") as f:
@@ -69,19 +70,40 @@ class Test():
                     self.job_list.append(j)
                     j["added"] = current_time
                     
-                                
+    def draw_text(self,pos,text):
+        #textColor = graphics.Color(int(int(self.light_color[0])*self.light_intensity),int(int(self.light_color[1])*self.light_intensity),int(int(self.light_color[2])*self.light_intensity))
+        #self.offscreen_canvas.Clear()
+        #graphics.DrawText(self.offscreen_canvas, self.font, pos, self.vert, textColor, text)
+
+        #self.offscreen_canvas = self.matrix.SwapOnVSync(self.offscreen_canvas)
+        if(climateclock_util.get_local_time() > self.t_old):
+            print(text + "; " + str(pos))
+            self.t_old = climateclock_util.get_local_time()
+
+
     def run(self):
+        #self.offscreen_canvas = self.matrix.CreateFrameCanvas()
+        #self.font = graphics.Font()
+        #self.font.LoadFont(self.countobject.font)
+        self.vert = 26
+
         curr_sunset = 0
         curr_sundown = 0
+
+        #imageviewer.draw_image(self.matrix,"img/stripes_Klimauhr6.jpg",10)
+        #imageviewer.draw_image(self.matrix,"img/logo_kiel3.jpg",20)
+
+        #konstruktion mit t_old ist nur fuer test hier (realistischere zeiten)
+        self.t_old = climateclock_util.get_local_time()
+
         while True:
-            
             current_time = climateclock_util.get_local_time()
+
             # 1x am Tag (um 0 Uhr): Sonnenaufgangs- und -untergangszeit aktualisieren
-            #if(current_time == 0 and (time() - self.d_l_time_updated) >= 86400):
+            if(current_time == 0):
             #Fuer Test: alle 10 Sekunden neu einlesen
-            if(current_time%10 == 0 and (time() - self.d_l_time_updated) >= 10):
+            #if(current_time%10 == 0):
                 self.get_daylight_times(datetime.now())
-                self.d_l_time_updated = time()
 
                 # Helligkeit auf Basis der Tageszeit berechnen:
                 curr_sunset = (self.daylight[0][0] * 3600) +  (self.daylight[0][1] * 60) + self.daylight[0][2]
@@ -94,19 +116,29 @@ class Test():
                 self.light_intensity = self.light_intensity_night
                 self.light_color = self.light_color_night.split(",")
 
-            self.update_job_list(current_time)
+            #nur hoechstens jede neue sekunde joblist updaten
+            if(current_time > self.job_list_updated):
+                self.update_job_list(current_time)
+                self.job_list_updated = current_time
 
+            #falls jobliste nicht leer:
             if(len(self.job_list) > 0):
                 if(self.job_list[0]["type"] == "text"):
                     display_text = self.countobject.display_text(self.job_list[0]["content"], self.job_list[0]["text_width"], 256, current_time)
-                    print(display_text)
+                    self.draw_text(display_text[1],display_text[0])
+                    
+                    
                 elif(self.job_list[0]["type"] == "img"):
-                    #display_text = imageviewer.draw_image(self.matrix,self.job_list[0]["content"]])
-                    print(self.job_list[0])
+                    #display_text = imageviewer.draw_image(self.matrix,self.job_list[0]["content"],None)
                     display_text = [False]
-                #Falls Job beendet oder Zeit abgelaufen: aus Jobliste loeschen
+                    if(current_time > self.t_old):
+                        print(self.job_list[0])
+                        self.t_old = current_time
+
+                #Falls Job beendet oder Zeit abgelaufen: Job aus Jobliste loeschen
                 if(display_text[-1] == True or (self.job_list[0]["duration"] > 0 and self.job_started + self.job_list[0]["duration"] < current_time)):
                     self.job_list.pop(0)
+                    self.job_started = current_time
                 
             else:
                 #Zeit fuer duration fuer naechsten Durchlauf initialisieren
@@ -114,14 +146,8 @@ class Test():
                 
                 # Unser Zaehlobjekt anfragen
                 display_text = self.countobject.count()
-                print(display_text)
-                
-            sleep(0.005)
+                self.draw_text(display_text[1],display_text[0])
 
+            sleep(0.015)
 t = Test()
 t.run()
-
-while True:
-    t.update_job_list(climateclock_util.get_local_time())
-    print(t.job_list)
-    sleep(1)

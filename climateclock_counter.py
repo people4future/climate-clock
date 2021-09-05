@@ -26,7 +26,6 @@ def to_digit2(num):
         return str(num)
 
 
-
 class Countobject():
     def __init__(self,display_size):
 
@@ -60,8 +59,7 @@ class Countobject():
         return(ret_val)
 
 
-    # Hauptfunktion der Klasse
-    # Startet Berechnung, setzt ggf. Sleeptime und gibt anzuzeigenden Text zureuck
+    # Hauptfunktion count fuer die Berechnung der Zeitanzeige
     def count(self):
 
         ret_val = []
@@ -78,9 +76,9 @@ class Countobject():
 
         return ret_val
 
+    # Hauptfunktion display_text fuer die Berechnung der Lauftextanzeige
     def display_text(self,text, text_width, display_size, current_time):
 
-        #Performanceoptimierung moeglich: Clock nur berechnen, wenn in Anzeige
         if("$CLOCK$" in text):
             text = text.replace("$CLOCK$","")
             clock_text = self.count()[0]

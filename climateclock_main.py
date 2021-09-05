@@ -21,7 +21,6 @@ class RunText(SampleBase):
         climateclock_util.load_config(self)
 
         self.daylight = [[0,0,0],[0,0,0]]
-        self.d_l_time_updated = 0
         self.light_intensity = self.light_intensity_night
         self.light_color = self.light_color_night.split(",")
         self.get_daylight_times(datetime.now())
@@ -80,13 +79,19 @@ class RunText(SampleBase):
                     self.job_list.append(j)
                     j["added"] = current_time
 
+    def draw_text(self,pos,text):
+        textColor = graphics.Color(int(int(self.light_color[0])*self.light_intensity),int(int(self.light_color[1])*self.light_intensity),int(int(self.light_color[2])*self.light_intensity))
+        self.offscreen_canvas.Clear()
+        graphics.DrawText(self.offscreen_canvas, self.font, pos, self.vert, textColor, text)
+
+        self.offscreen_canvas = self.matrix.SwapOnVSync(self.offscreen_canvas)
+
 
     def run(self):
-        offscreen_canvas = self.matrix.CreateFrameCanvas()
-        font = graphics.Font()
-        font.LoadFont(self.countobject.font)
-        pos = 0
-        vert = 26
+        self.offscreen_canvas = self.matrix.CreateFrameCanvas()
+        self.font = graphics.Font()
+        self.font.LoadFont(self.countobject.font)
+        self.vert = 26
 
         curr_sunset = 0
         curr_sundown = 0
@@ -99,11 +104,10 @@ class RunText(SampleBase):
             current_time = climateclock_util.get_local_time()
 
             # 1x am Tag (um 0 Uhr): Sonnenaufgangs- und -untergangszeit aktualisieren
-            #if(current_time == 0 and (time() - self.d_l_time_updated) >= 86400):
+            if(current_time == 0):
             #Fuer Test: alle 10 Sekunden neu einlesen
-            if(current_time%10 == 0 and (time() - self.d_l_time_updated) >= 10):
+            #if(current_time%10 == 0):
                 self.get_daylight_times(datetime.now())
-                self.d_l_time_updated = time()
 
                 # Helligkeit auf Basis der Tageszeit berechnen:
                 curr_sunset = (self.daylight[0][0] * 3600) +  (self.daylight[0][1] * 60) + self.daylight[0][2]
@@ -116,23 +120,21 @@ class RunText(SampleBase):
                 self.light_intensity = self.light_intensity_night
                 self.light_color = self.light_color_night.split(",")
 
+            #nur hoechstens jede neue sekunde joblist updaten
             if(current_time > self.job_list_updated):
                 self.update_job_list(current_time)
                 self.job_list_updated = current_time
 
+            #falls jobliste nicht leer:
             if(len(self.job_list) > 0):
                 if(self.job_list[0]["type"] == "text"):
                     display_text = self.countobject.display_text(self.job_list[0]["content"], self.job_list[0]["text_width"], 256, current_time)
-                    textColor = graphics.Color(int(int(self.light_color[0])*self.light_intensity),int(int(self.light_color[1])*self.light_intensity),int(int(self.light_color[2])*self.light_intensity))
-                    offscreen_canvas.Clear()
-                    graphics.DrawText(offscreen_canvas, font, display_text[1], vert, textColor, display_text[0])
-
-                    offscreen_canvas = self.matrix.SwapOnVSync(offscreen_canvas)
-
+                    self.draw_text(display_text[1],display_text[0])
+                    
                 elif(self.job_list[0]["type"] == "img"):
                     display_text = imageviewer.draw_image(self.matrix,self.job_list[0]["content"],None)
 
-                #Falls Job beendet oder Zeit abgelaufen: aus Jobliste loeschen
+                #Falls Job beendet oder Zeit abgelaufen: Job aus Jobliste loeschen
                 if(display_text[-1] == True or (self.job_list[0]["duration"] > 0 and self.job_started + self.job_list[0]["duration"] < current_time)):
                     self.job_list.pop(0)
                     self.job_started = current_time
@@ -143,18 +145,11 @@ class RunText(SampleBase):
                 
                 # Unser Zaehlobjekt anfragen
                 display_text = self.countobject.count()
-                textColor = graphics.Color(int(int(self.light_color[0])*self.light_intensity),int(int(self.light_color[1])*self.light_intensity),int(int(self.light_color[2])*self.light_intensity))
-                offscreen_canvas.Clear()
-                graphics.DrawText(offscreen_canvas, font, display_text[1], vert, textColor, display_text[0])
-
-                offscreen_canvas = self.matrix.SwapOnVSync(offscreen_canvas)
+                self.draw_text(display_text[1],display_text[0])
 
             sleep(0.015)
 
-        offscreen_canvas.Clear()
-        #len = 
-        graphics.DrawText(offscreen_canvas, font, pos, vert, textColor, display_text)
-        offscreen_canvas = self.matrix.SwapOnVSync(offscreen_canvas)
+        self.draw_text(display_text[1],display_text[0])
 
 # Main function
 if __name__ == "__main__":

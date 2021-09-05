@@ -117,39 +117,44 @@ class Countobject():
             ret_val = False
         
         return(ret_val)
-        
-    # Hauptfunktion der Klasse
-    # Startet Berechnung, setzt ggf. Sleeptime und gibt anzuzeigenden Text zureuck
-    def count(self,current_time):
 
-        ret_val = ""
+    # Hauptfunktion count fuer die Berechnung der Zeitanzeige
+    def count(self):
+
+        ret_val = []
         t = self.get_time()
         if t != False:
-
+            
             # Info-Text entsprechend der Konfiguration alle x Sekunden fuer y Sekunden einblenden
             clock_text = str(t[0]) + "J. " + to_digit2(t[1]) + "T. " + to_digit(t[2]) + ":" + to_digit(t[3]) + ":" + to_digit(t[4])
+            ret_val = [clock_text, 5,True]
 
-            ret_val = [clock_text, 5]
-
-            #current_time = time()
-            if(self.mode == "info"):
-                if(self.curr_frame > self.info_duration):
-                    self.mode = "clock"
-                    self.timer = current_time
-                else:
-                    self.position -= 1
-                    self.curr_frame += 1
-                    ret_val = [self.info_text + "  " + clock_text, self.position]
-            else:
-                if(current_time > self.timer + self.clock_duration):
-                    self.mode = "info"
-                    self.timer = current_time
-                    self.position = 256
-                    self.curr_frame = 0
-                    
             self.count_time_4test()
 
         else:
-            ret_val = [self.text_failed,9]
+            ret_val = [self.text_failed,9,True]
 
         return ret_val
+
+    # Hauptfunktion display_text fuer die Berechnung der Lauftextanzeige
+    def display_text(self,text, text_width, display_size, current_time):
+
+        if("$CLOCK$" in text):
+            text = text.replace("$CLOCK$","")
+            clock_text = self.count()[0]
+        else:
+            clock_text = ""
+        #Falls Text durchgelaufen: Reset und Uhr anzeigen
+        if(self.curr_frame > text_width + display_size+16):
+            self.curr_frame = 0
+            self.position = display_size
+            ret_val = [clock_text, self.position,True]
+
+        #Ansonsten: Text um 1 Frame verschieben
+        else:
+            self.position -= 1
+            self.curr_frame += 1
+            ret_val = [text + "  " + clock_text, self.position,False]
+                    
+        return ret_val
+
