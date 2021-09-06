@@ -85,7 +85,7 @@ class Countobject():
         else:
             clock_text = ""
         #Falls Text durchgelaufen: Reset und Uhr anzeigen
-        if(self.curr_frame > text_width + display_size+16):
+        if(self.curr_frame > text_width + display_size + 27):
             self.curr_frame = 0
             self.position = display_size
             ret_val = [clock_text, self.position,True]
@@ -95,5 +95,5 @@ class Countobject():
             self.position -= 1
             self.curr_frame += 1
             ret_val = [text + "  " + clock_text, self.position,False]
-                    
+
         return ret_val

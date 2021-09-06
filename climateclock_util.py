@@ -21,7 +21,7 @@ def load_config(target_obj):
             if(line != "" and not line.startswith(";")):
                 tup = line.split("=")
                 tup[0] = tup[0].strip()
-                
+
                 if(re.match(r"^\d+\.*\d*$",tup[1])):
                     tup[1] = float(tup[1])
                 setattr(target_obj,tup[0],tup[1])
@@ -42,4 +42,7 @@ def calculate_text_width(text):
         font_width +=2
         text_width += font_width
 
+    #Clock-Alias herausrechnen
+    if("$CLOCK$" in text and text != "$CLOCK$"):
+        text_width -= calculate_text_width("$CLOCK$")
     return text_width

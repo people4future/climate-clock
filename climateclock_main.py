@@ -147,7 +147,7 @@ class RunText(SampleBase):
                 display_text = self.countobject.count()
                 self.draw_text(display_text[1],display_text[0])
 
-            sleep(0.015)
+            sleep(0.01)
 
         self.draw_text(display_text[1],display_text[0])
 
