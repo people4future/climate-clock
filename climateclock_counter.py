@@ -31,13 +31,11 @@ class Countobject():
 
         climateclock_util.load_config(self)
         
-        # Timer fuer Infoanzeige
-        # Zaehlt unabhaengig von Uhrzeit, da beliebige Intervalle moeglich sein sollen
         self.timer = climateclock_util.get_local_time()
-        #self.mode = "clock"
-        #self.curr_text_width = calculate_text_width(self.info_text) + display_size+16
+        self.ret_val = ["", 5,True]
         self.curr_frame = 0
         self.position = display_size
+        self.text_failed_width = climateclock_util.calculate_text_width(self.text_failed)
 
 
     # Fuehrt Zeit-Subtraktion aus.
@@ -46,42 +44,49 @@ class Countobject():
         t0 = datetime.now()
         t1 = datetime.strptime(self.fail_date,"%Y-%m-%d %H:%M:%S")
 
-        #Zeitunterschied berechnen
+        #Zeitunterschiede berechnen
         delta = relativedelta(t1,t0)
-        days = (t1-t0).days%365
-
-        ret_val = ""
-        if(int((t1-t0).total_seconds()) > 0):
-            ret_val = delta.years, days, delta.hours, delta.minutes, delta.seconds,(t1-t0).total_seconds()
+        if((t1-t0).days > 0):
+            days = (t1-t0).days%365
         else:
-            ret_val = False
+            days = 0
+
+        ret_val = delta.years, days, delta.hours, delta.minutes, delta.seconds,(t1-t0).total_seconds()
 
         return(ret_val)
 
 
     # Hauptfunktion count fuer die Berechnung der Zeitanzeige
-    def count(self):
+    def count(self,display_size,mode):
 
-        ret_val = []
-        t = self.get_time()
-        if t != False:
+        #Uhr hoechstens jede Sekunde aktualisieren
+        if(not self.text_failed in self.ret_val[0]):
             
-            # Info-Text entsprechend der Konfiguration alle x Sekunden fuer y Sekunden einblenden
-            clock_text = str(t[0]) + "J. " + to_digit2(t[1]) + "T. " + to_digit(t[2]) + ":" + to_digit(t[3]) + ":" + to_digit(t[4])
-            ret_val = [clock_text, 5,True]
-
+            if(self.timer < climateclock_util.get_local_time()):
+                t = self.get_time()
+                if(t[0] > 0 and t[1] > 0 and t[2] > 0 and t[3] > 0 and t[4] > 0):
+                    # Info-Text entsprechend der Konfiguration alle x Sekunden fuer y Sekunden einblenden
+                    clock_text = str(t[0]) + "J. " + to_digit2(t[1]) + "T. " + to_digit(t[2]) + ":" + to_digit(t[3]) + ":" + to_digit(t[4])
+                    self.ret_val = [clock_text, 5,True]
+                else:
+                    self.ret_val = [self.text_failed, 5,True]
+                
+            self.timer = climateclock_util.get_local_time()
 
         else:
-            ret_val = [self.text_failed,9,True]
-
-        return ret_val
+            if(mode == "text"):
+                self.ret_val = [self.text_failed,9,True]
+            elif(mode == "display"):
+                self.ret_val =  self.display_text(self.text_failed, self.text_failed_width, display_size, climateclock_util.get_local_time())
+ 
+        return self.ret_val
 
     # Hauptfunktion display_text fuer die Berechnung der Lauftextanzeige
     def display_text(self,text, text_width, display_size, current_time):
 
         if("$CLOCK$" in text):
             text = text.replace("$CLOCK$","")
-            clock_text = self.count()[0]
+            clock_text = self.count(display_size,"text")[0]
         else:
             clock_text = ""
         #Falls Text durchgelaufen: Reset und Uhr anzeigen

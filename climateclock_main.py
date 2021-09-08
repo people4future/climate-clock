@@ -144,7 +144,7 @@ class RunText(SampleBase):
                 self.job_started = current_time
                 
                 # Unser Zaehlobjekt anfragen
-                display_text = self.countobject.count()
+                display_text = self.countobject.count(256,mode)
                 self.draw_text(display_text[1],display_text[0])
 
             sleep(0.01)

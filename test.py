@@ -145,7 +145,7 @@ class Test():
                 self.job_started = current_time
                 
                 # Unser Zaehlobjekt anfragen
-                display_text = self.countobject.count()
+                display_text = self.countobject.count(256,"display")
                 self.draw_text(display_text[1],display_text[0])
 
             sleep(0.015)

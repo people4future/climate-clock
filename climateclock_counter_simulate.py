@@ -46,18 +46,13 @@ class Countobject():
         
         climateclock_util.load_config(self)
 
-        # Timer fuer Infoanzeige
-        # Zaehlt unabhaengig von Uhrzeit, da beliebige Intervalle moeglich sein sollen
-        self.timer = time()
         self.start_time = time()
-        self.mode = "clock"
-        self.curr_text_width = calculate_text_width(self.info_text)
+        self.timer = climateclock_util.get_local_time()
+        self.ret_val = ["", 5,True]
         self.curr_frame = 0
         self.position = display_size
-        self.daylight = [[0,0,0],[0,0,0]]
-        self.d_l_time_updated = 0
-        self.light_intensity = self.light_intensity_night
-        self.light_color = self.light_color_night.split(",")
+        self.text_failed_width = climateclock_util.calculate_text_width(self.text_failed)
+
 
 
         # Fuer Test: Aktuellen Zeitpunkt setzen auf 04.10.2027 11:59:50
@@ -76,27 +71,15 @@ class Countobject():
         self.start_time = self.start_time + delta
         if(self.test_t0.second + delta <= 59):
             self.test_t0 = self.test_t0.replace(second=self.test_t0.second+delta)
+
         else:
+            self.test_t0 = self.test_t0.replace(year=2029)
+            self.test_t0 = self.test_t0.replace(month=7)
+            self.test_t0 = self.test_t0.replace(day=24)
             self.test_t0 = self.test_t0.replace(hour=self.test_t0.hour + 1)
             self.test_t0 = self.test_t0.replace(minute=0)
             self.test_t0 = self.test_t0.replace(second=0)
 
-    def get_daylight_times(self,datetime_obj):
-        with open("daylight_times.csv","r") as f:
-            c = f.read()
-        lines = c.split("\n")
-        for l in lines:
-            values = l.split(";")
-            if(str(datetime_obj.month) == values[1] and str(datetime_obj.day) == values[0]):
-                self.daylight = []
-                self.daylight.append(values[2].split(":"))
-                self.daylight.append(values[3].split(":"))
-
-        for i in range(len(self.daylight[0])):
-            self.daylight[0][i] = int(self.daylight[0][i])
-            
-        for i in range(len(self.daylight[1])):
-            self.daylight[1][i] = int(self.daylight[1][i])
 
     # Fuehrt Zeit-Subtraktion aus.
     # Rueckgabe ist Zeit-Array ([J,T,H,Min,S]) oder False, falls Zeit abgelaufen ist
@@ -106,42 +89,49 @@ class Countobject():
         t0 = self.test_t0
         t1 = datetime.strptime(self.fail_date,"%Y-%m-%d %H:%M:%S")
 
-        #Zeitunterschied berechnen
+        #Zeitunterschiede berechnen
         delta = relativedelta(t1,t0)
-        days = (t1-t0).days%365
-        
-        ret_val = ""
-        if(int((t1-t0).total_seconds()) > 0):
-            ret_val = delta.years, days, delta.hours, delta.minutes, delta.seconds
+        if((t1-t0).days > 0):
+            days = (t1-t0).days%365
         else:
-            ret_val = False
-        
+            days = 0
+
+        ret_val = delta.years, days, delta.hours, delta.minutes, delta.seconds,(t1-t0).total_seconds()
+
         return(ret_val)
 
     # Hauptfunktion count fuer die Berechnung der Zeitanzeige
-    def count(self):
+    def count(self,display_size, mode):
 
-        ret_val = []
-        t = self.get_time()
-        if t != False:
-            
-            # Info-Text entsprechend der Konfiguration alle x Sekunden fuer y Sekunden einblenden
-            clock_text = str(t[0]) + "J. " + to_digit2(t[1]) + "T. " + to_digit(t[2]) + ":" + to_digit(t[3]) + ":" + to_digit(t[4])
-            ret_val = [clock_text, 5,True]
-
-            self.count_time_4test()
+        #Uhr hoechstens jede Sekunde aktualisieren
+        if(not self.text_failed in self.ret_val[0]):
+            if(self.timer < climateclock_util.get_local_time()):
+                t = self.get_time()
+                if(t[0] > 0 or t[1] > 0 or t[2] > 0 or t[3] > 0 or t[4] > 0):
+                    # Info-Text entsprechend der Konfiguration alle x Sekunden fuer y Sekunden einblenden
+                    clock_text = str(t[0]) + "J. " + to_digit2(t[1]) + "T. " + to_digit(t[2]) + ":" + to_digit(t[3]) + ":" + to_digit(t[4])
+                    self.ret_val = [clock_text, 5,True]
+                else:
+                    self.ret_val = [self.text_failed, 5,True]
+                
+            self.timer = climateclock_util.get_local_time()
 
         else:
-            ret_val = [self.text_failed,9,True]
+            if(mode == "text"):
+                self.ret_val = [self.text_failed,9,True]
+            elif(mode == "display"):
+                self.ret_val =  self.display_text(self.text_failed, self.text_failed_width, display_size, climateclock_util.get_local_time())
 
-        return ret_val
+        self.count_time_4test()
+
+        return self.ret_val
 
     # Hauptfunktion display_text fuer die Berechnung der Lauftextanzeige
     def display_text(self,text, text_width, display_size, current_time):
 
         if("$CLOCK$" in text):
             text = text.replace("$CLOCK$","")
-            clock_text = self.count()[0]
+            clock_text = self.count(display_size,"text")[0]
         else:
             clock_text = ""
         #Falls Text durchgelaufen: Reset und Uhr anzeigen
