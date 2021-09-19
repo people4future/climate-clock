@@ -21,7 +21,8 @@ def draw_image(matrix,img_name,opt_sleep_time):
     # Make image fit our screen.
     image.thumbnail((matrix.width, matrix.height), Image.ANTIALIAS)
 
-    matrix.SetImage(image.convert('RGB'))
+    #matrix.SetImage(image.convert('RGB'))
+    matrix.SetImage(image)
     if(opt_sleep_time != None):
         time.sleep(opt_sleep_time)
     return([False])

@@ -24,9 +24,10 @@ class RunText(SampleBase):
         self.light_intensity = self.light_intensity_night
         self.light_color = self.light_color_night.split(",")
         self.get_daylight_times(datetime.now())
-        
+
         # Unser Zaehlobjekt anlegen
         self.countobject = Countobject(256)
+
 
         #alle konfigurierten Jobs laden
         # und mit Zeitstempel versehen
@@ -73,7 +74,7 @@ class RunText(SampleBase):
                 if(cron[2] != "*"):
                     t += int(cron[2])*3600
             if(t > 0 and current_time%t == 0 and j["added"] != current_time):
- 
+
                 #Falls jobliste zu voll: nicht hinzufuegen
                 if(len(self.job_list) < 20):
                     self.job_list.append(j)
@@ -93,11 +94,13 @@ class RunText(SampleBase):
         self.font.LoadFont(self.countobject.font)
         self.vert = 26
 
-        curr_sunset = 0
-        curr_sundown = 0
+        curr_sunset = (self.daylight[0][0] * 3600) +  (self.daylight[0][1] * 60) + self.daylight[0][2]
+        curr_sundown = (self.daylight[1][0] * 3600) +  (self.daylight[1][1] * 60) + self.daylight[1][2]
+
 
         imageviewer.draw_image(self.matrix,"img/stripes_Klimauhr6.jpg",10)
         #imageviewer.draw_image(self.matrix,"img/logo_kiel3.jpg",20)
+        #imageviewer.draw_image(self.matrix,"img/256 x 32.jpg",20)
 
         while True:
 
@@ -144,10 +147,10 @@ class RunText(SampleBase):
                 self.job_started = current_time
                 
                 # Unser Zaehlobjekt anfragen
-                display_text = self.countobject.count(256,mode)
+                display_text = self.countobject.count(256,"display")
                 self.draw_text(display_text[1],display_text[0])
 
-            sleep(0.01)
+            sleep(0.015)
 
         self.draw_text(display_text[1],display_text[0])
 
