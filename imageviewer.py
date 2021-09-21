@@ -25,4 +25,3 @@ def draw_image(matrix,img_name,opt_sleep_time):
     matrix.SetImage(image)
     if(opt_sleep_time != None):
         time.sleep(opt_sleep_time)
-    return([False])
