@@ -44,10 +44,12 @@ class ScreenUpdater():
         
         while True:
             current_time = climateclock_util.get_local_time()
-            try:
+            """try:
                 display_content = queue.get(False)
             except:
-                pass
+                pass"""
+            if(not queue.empty()):
+                display_content = queue.get(False)
 
             if(display_content["type"] == "text"):
                 self.draw_text(display_content["content"][1],display_content["content"][0], display_content["config"][0], display_content["config"][1])
