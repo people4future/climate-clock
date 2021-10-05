@@ -13,35 +13,34 @@ import json
 #from climateclock_counter_simulate import Countobject
 import imageviewer
 
-class ScreenUpdater():
+class ScreenUpdater(SampleBase):
     def __init__(self, *args, **kwargs):
-        super(RunText, self).__init__(*args, **kwargs)
+        super(ScreenUpdater, self).__init__(*args, **kwargs)
         self.parser.add_argument("-t", "--text", help="The text to scroll on the RGB LED panel", default="Hello world!")
 
         #eigenstaendige configs laden
         climateclock_util.load_config(self)
-        
-        self.offscreen_canvas = self.matrix.CreateFrameCanvas()
-        self.font = graphics.Font()
+
         #self.font.LoadFont(self.countobject.font)
-        self.font.LoadFont(self.font)
         self.vert = 26
 
     def draw_text(self,pos,text,light_color, light_intensity):
-        textColor = graphics.Color(int(int(self.light_color[0])*self.light_intensity),int(int(self.light_color[1])*self.light_intensity),int(int(self.light_color[2])*self.light_intensity))
+        textColor = graphics.Color(int(int(light_color[0])*light_intensity),int(int(light_color[1])*light_intensity),int(int(light_color[2])*light_intensity))
         self.offscreen_canvas.Clear()
-        graphics.DrawText(self.offscreen_canvas, self.font, pos, self.vert, textColor, text)
-
+        graphics.DrawText(self.offscreen_canvas, self.font_obj, pos, self.vert, textColor, text)
         self.offscreen_canvas = self.matrix.SwapOnVSync(self.offscreen_canvas)
 
     def run(self,queue):
-        
+        self.offscreen_canvas = self.matrix.CreateFrameCanvas()
+        self.font_obj = graphics.Font()
+        self.font_obj.LoadFont(self.font)
+
         # content: text/img-src, position; config: [[r,b,g],intensity]
         display_content = {"type":"text","content":["", 0], "config":[[255,255,255],1]}
 
         imageviewer.draw_image(self.matrix,"img/stripes_Klimauhr6.jpg",10)
         #imageviewer.draw_image(self.matrix,"img/logo_kiel3.jpg",20)
-        
+
         while True:
             current_time = climateclock_util.get_local_time()
             """try:
@@ -53,10 +52,10 @@ class ScreenUpdater():
 
             if(display_content["type"] == "text"):
                 self.draw_text(display_content["content"][1],display_content["content"][0], display_content["config"][0], display_content["config"][1])
-                
+
             elif(display_content["type"] == "img"):
                 imageviewer.draw_image(self.matrix,display_content["content"],None)
-                
+
             sleep(0.015)
 
 class Calculator():
@@ -187,16 +186,22 @@ class Calculator():
             queue.put(queue_message, block=False)
             sleep(0.015)
 
+def create_screenupdater(queue):
+    screenupdater = ScreenUpdater()
+    screenupdater.process()
+    screenupdater.run(queue)
+
 # Main function
 if __name__ == "__main__":
     queue = multiprocessing.Queue()
 
     calculator = Calculator()
-    screenupdater = ScreenUpdater()
+    #screenupdater = ScreenUpdater()
+    #screenupdater.process()
     
     calculation_process = multiprocessing.Process(target=calculator.run, args=(queue,))
-    refresh_process = multiprocessing.Process(target=screenupdater.run, args=(queue,))
-
+    #refresh_process = multiprocessing.Process(target=screenupdater.run, args=(queue,))
+    refresh_process = multiprocessing.Process(target=create_screenupdater,args=(queue,))
     calculation_process.start()
     refresh_process.start()
 
