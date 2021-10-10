@@ -29,7 +29,7 @@ def to_digit2(num):
 class Countobject():
     def __init__(self,display_size):
 
-        climateclock_util.load_config(self)
+        climateclock_util.load_config("config.ini.template",self)
         
         self.timer = climateclock_util.get_local_time()
         self.ret_val = ["", 5,True]

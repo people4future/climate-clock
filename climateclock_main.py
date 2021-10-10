@@ -18,12 +18,13 @@ class RunText(SampleBase):
         self.parser.add_argument("-t", "--text", help="The text to scroll on the RGB LED panel", default="Hello world!")
 
         #eigenstaendige configs laden
-        climateclock_util.load_config(self)
+        climateclock_util.load_config("config.ini.template",self)
 
         self.daylight = [[0,0,0],[0,0,0]]
         self.light_intensity = self.light_intensity_night
         self.light_color = self.light_color_night.split(",")
         self.get_daylight_times(datetime.now())
+        self.debug = True
 
         # Unser Zaehlobjekt anlegen
         self.countobject = Countobject(256)
@@ -151,6 +152,12 @@ class RunText(SampleBase):
                 self.draw_text(display_text[1],display_text[0])
 
             sleep(0.015)
+            
+            # Im Debug-Modus: RGB-Config alle 3 Minuten neuladen
+            if(self.debug):
+                if(current_time%180 == 0):
+                    self.reload_rgb_configs()
+                    print("Configs neugeladen")
 
         self.draw_text(display_text[1],display_text[0])
 

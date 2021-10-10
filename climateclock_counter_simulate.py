@@ -44,7 +44,7 @@ def calculate_text_width(text):
 class Countobject():
     def __init__(self,display_size):
         
-        climateclock_util.load_config(self)
+        climateclock_util.load_config("config.ini.template",self)
 
         self.start_time = time()
         self.timer = climateclock_util.get_local_time()

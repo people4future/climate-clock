@@ -9,13 +9,14 @@ from climateclock_counter import Countobject
 class Test():
     def __init__(self):
         #eigenstaendige configs laden
-        climateclock_util.load_config(self)
+        climateclock_util.load_config("config.ini.template",self)
 
         self.daylight = [[0,0,0],[0,0,0]]
         self.d_l_time_updated = 0
         self.light_intensity = self.light_intensity_night
         self.light_color = self.light_color_night.split(",")
         self.get_daylight_times(datetime.now())
+        self.debug = True
         
         # Unser Zaehlobjekt anlegen
         self.countobject = Countobject(256)
@@ -149,5 +150,19 @@ class Test():
                 self.draw_text(display_text[1],display_text[0])
 
             sleep(0.015)
+
+            # Im Debug-Modus: RGB-Config alle 3 Minuten neuladen
+            if(self.debug):
+                if(current_time%180 == 0):
+                    self.reload_rgb_configs()
+                    print("Configs neugeladen")
+            
+
+    def reload_rgb_configs(self):
+        #       3. reload_configs zeitgesteuert in Funktion process aufrufen
+        climateclock_util.load_config("rgb_configs.ini",self)
+        #print(self.__dict__)
+        print(type(self.led_no_drop_privs))
+
 t = Test()
 t.run()
