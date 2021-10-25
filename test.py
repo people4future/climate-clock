@@ -87,6 +87,7 @@ class Test():
         #self.font = graphics.Font()
         #self.font.LoadFont(self.countobject.font)
         self.vert = 26
+        self.sleep_time = 0.015
 
         curr_sunset = 0
         curr_sundown = 0
@@ -124,6 +125,7 @@ class Test():
 
             #falls jobliste nicht leer:
             if(len(self.job_list) > 0):
+                self.sleep_time = 0.015
                 if(self.job_list[0]["type"] == "text"):
                     display_text = self.countobject.display_text(self.job_list[0]["content"], self.job_list[0]["text_width"], 256, current_time)
                     self.draw_text(display_text[1],display_text[0])
@@ -142,6 +144,7 @@ class Test():
                     self.job_started = current_time
                 
             else:
+                self.sleep_time = 0.33
                 #Zeit fuer duration fuer naechsten Durchlauf initialisieren
                 self.job_started = current_time
                 
@@ -149,14 +152,7 @@ class Test():
                 display_text = self.countobject.count(256,"display")
                 self.draw_text(display_text[1],display_text[0])
 
-            sleep(0.015)
-
-            # Im Debug-Modus: RGB-Config alle 3 Minuten neuladen
-            if(self.debug):
-                if(current_time%180 == 0):
-                    self.reload_rgb_configs()
-                    print("Configs neugeladen")
-            
+            sleep(self.sleep_time)
 
     def reload_rgb_configs(self):
         #       3. reload_configs zeitgesteuert in Funktion process aufrufen

@@ -10,7 +10,9 @@ from rgbmatrix import RGBMatrix, RGBMatrixOptions
 
 class SampleBase(object):
     def __init__(self, *args, **kwargs):
+
         self.parser = argparse.ArgumentParser()
+        """
 
         self.parser.add_argument("-r", "--led-rows", action="store", help="Display rows. 16 for 16x32, 32 for 32x32. Default: 32", default=32, type=int)
         self.parser.add_argument("--led-cols", action="store", help="Panel columns. Typically 32 or 64. (Default: 32)", default=32, type=int)
@@ -30,7 +32,7 @@ class SampleBase(object):
         self.parser.add_argument("--led-multiplexing", action="store", help="Multiplexing type: 0=direct; 1=strip; 2=checker; 3=spiral; 4=ZStripe; 5=ZnMirrorZStripe; 6=coreman; 7=Kaler2Scan; 8=ZStripeUneven... (Default: 0)", default=0, type=int)
         self.parser.add_argument("--led-panel-type", action="store", help="Needed to initialize special panels. Supported: 'FM6126A'", default="", type=str)
         self.parser.add_argument("--led-no-drop-privs", dest="drop_privileges", help="Don't drop privileges from 'root' after initializing the hardware.", action='store_false')
-        self.parser.set_defaults(drop_privileges=True)
+        self.parser.set_defaults(drop_privileges=True)"""
 
     def usleep(self, value):
         time.sleep(value / 1000000.0)
@@ -71,19 +73,7 @@ class SampleBase(object):
 
         self.matrix = RGBMatrix(options = options)
         """
-        self.reload_rgb_configs()
-        try:
-            # Start loop
-            print("Press CTRL-C to stop sample")
-            self.run()
-        except KeyboardInterrupt:
-            print("Exiting\n")
-            sys.exit(0)
 
-        return True
-
-    def reload_rgb_configs(self):
-        #       3. reload_configs zeitgesteuert in Funktion process aufrufen
         climateclock_util.load_config("rgb_configs.ini",self)
 
         options = RGBMatrixOptions()
@@ -103,16 +93,29 @@ class SampleBase(object):
         options.pixel_mapper_config = self.led_pixel_mapper
         options.panel_type = self.led_panel_type
         options.drop_privileges=True
+        options.pwm_dither_bits = self.led_pwm_dither_bits
+        options.limit_refresh_rate_hz = self.led_limit_refresh_rate_hz
 
         if self.led_show_refresh == "True" or self.led_show_refresh == 1:
           options.show_refresh_rate = 1
 
         if self.led_slowdown_gpio != "":
             options.gpio_slowdown = self.led_slowdown_gpio
-        if self.led_no_hardware_pulse == "True" or elf.led_no_hardware_pulse == 1:
+        if self.led_no_hardware_pulse == "True" or self.led_no_hardware_pulse == 1:
           options.disable_hardware_pulsing = True
         if self.led_no_drop_privs == "False" or self.led_no_drop_privs == 0:
           options.drop_privileges=False
+        print(dir(options))
+        self.matrix =  RGBMatrix(options = options)
 
-        self.matrix = RGBMatrix(options = options)
-        
+        try:
+            # Start loop
+            print("Press CTRL-C to stop sample")
+            self.run()
+        except KeyboardInterrupt:
+            print("Exiting\n")
+            sys.exit(0)
+
+        return True
+
+
