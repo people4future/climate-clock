@@ -100,7 +100,7 @@ class RunText(SampleBase):
         curr_sundown = (self.daylight[1][0] * 3600) +  (self.daylight[1][1] * 60) + self.daylight[1][2]
 
 
-        imageviewer.draw_image(self.matrix,"img/stripes_Klimauhr6.jpg",10)
+        imageviewer.draw_image(self.matrix,"img/stripes_Klimauhr6.jpg",self.light_intensity,10)
         #imageviewer.draw_image(self.matrix,"img/logo_kiel3.jpg",20)
         #imageviewer.draw_image(self.matrix,"img/256 x 32.jpg",20)
 
@@ -138,7 +138,7 @@ class RunText(SampleBase):
                     self.draw_text(display_text[1],display_text[0])
                     
                 elif(self.job_list[0]["type"] == "img"):
-                    display_text = imageviewer.draw_image(self.matrix,self.job_list[0]["content"],None)
+                    display_text = imageviewer.draw_image(self.matrix,self.job_list[0]["content"],self.light_intensity,None)
 
                 #Falls Job beendet oder Zeit abgelaufen: Job aus Jobliste loeschen
                 if(display_text[-1] == True or (self.job_list[0]["duration"] > 0 and self.job_started + self.job_list[0]["duration"] < current_time)):

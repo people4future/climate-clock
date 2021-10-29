@@ -3,7 +3,7 @@
 import time
 import sys
 #from rgbmatrix import RGBMatrix, RGBMatrixOptions
-from PIL import Image
+from PIL import Image, ImageEnhance
 import os
 
 # Configuration for the matrix
@@ -15,11 +15,13 @@ import os
 
 #matrix = RGBMatrix(options = options)
 
-def draw_image(matrix,img_name,opt_sleep_time):
+def draw_image(matrix,img_name,brightness, opt_sleep_time):
     image = Image.open(os.path.join(os.getcwd(),img_name))
 
     # Make image fit our screen.
     image.thumbnail((matrix.width, matrix.height), Image.ANTIALIAS)
+
+    image = ImageEnhance.Brightness(image).enhance(brightness)
 
     #matrix.SetImage(image.convert('RGB'))
     matrix.SetImage(image)
