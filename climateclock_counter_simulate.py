@@ -52,7 +52,7 @@ class Countobject():
         self.curr_frame = 0
         self.position = display_size
         self.text_failed_width = climateclock_util.calculate_text_width(self.text_failed)
-
+        self.status = "counting"
 
 
         # Fuer Test: Aktuellen Zeitpunkt setzen auf 04.10.2027 11:59:50
@@ -62,7 +62,7 @@ class Countobject():
         self.test_t0 = self.test_t0.replace(day=24)
         self.test_t0 = self.test_t0.replace(hour=11)
         self.test_t0 = self.test_t0.replace(minute=59)
-        self.test_t0 = self.test_t0.replace(second=50)
+        self.test_t0 = self.test_t0.replace(second=40)
 
     # Hilfsfunktion fuer Test: Zaehlt Zeit relativ zu Startzeitpunkt sekundenweise herunter
     def count_time_4test(self):
@@ -101,7 +101,7 @@ class Countobject():
         return(ret_val)
 
     # Hauptfunktion count fuer die Berechnung der Zeitanzeige
-    def count(self,display_size, mode):
+    def count(self,display_size):
 
         #Uhr hoechstens jede Sekunde aktualisieren
         if(not self.text_failed in self.ret_val[0]):
@@ -112,16 +112,18 @@ class Countobject():
                     clock_text = str(t[0]) + "J. " + to_digit2(t[1]) + "T. " + to_digit(t[2]) + ":" + to_digit(t[3]) + ":" + to_digit(t[4])
                     self.ret_val = [clock_text, 5,True]
                 else:
-                    self.ret_val = [self.text_failed, 5,True]
+                    self.ret_val = [self.text_failed, display_size,True]
+                    self.status = "failed"
+
                 
             self.timer = climateclock_util.get_local_time()
 
-        else:
+        """else:
             if(mode == "text"):
                 self.ret_val = [self.text_failed,9,True]
             elif(mode == "display"):
                 self.ret_val =  self.display_text(self.text_failed, self.text_failed_width, display_size, climateclock_util.get_local_time())
-
+        """
         self.count_time_4test()
 
         return self.ret_val
@@ -131,7 +133,10 @@ class Countobject():
 
         if("$CLOCK$" in text):
             text = text.replace("$CLOCK$","")
-            clock_text = self.count(display_size,"text")[0]
+            clock_text = self.count(display_size)[0]
+            if(self.status == "failed"):
+                text_width += self.text_failed_width
+                clock_text = self.text_failed
         else:
             clock_text = ""
         #Falls Text durchgelaufen: Reset und Uhr anzeigen

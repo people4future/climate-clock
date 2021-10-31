@@ -21,7 +21,7 @@ class RunText(SampleBase):
         climateclock_util.load_config("config.ini.template",self)
 
         self.daylight = [[0,0,0],[0,0,0]]
-        self.light_intensity = self.light_intensity_night
+        self.light_intensity = self.light_intensity_day
         self.light_color = self.light_color_night.split(",")
         self.get_daylight_times(datetime.now())
         self.debug = True
@@ -76,8 +76,8 @@ class RunText(SampleBase):
                     t += int(cron[2])*3600
             if(t > 0 and current_time%t == 0 and j["added"] != current_time):
 
-                #Falls jobliste zu voll: nicht hinzufuegen
-                if(len(self.job_list) < 20):
+                #Falls jobliste zu voll oder der finale countdown laeuft: nicht hinzufuegen
+                if(len(self.job_list) < 20 and self.countobject.status != "countdown"):
                     self.job_list.append(j)
                     j["added"] = current_time
 
@@ -134,9 +134,9 @@ class RunText(SampleBase):
             if(len(self.job_list) > 0):
                 self.sleep_time = 0.015
                 if(self.job_list[0]["type"] == "text"):
-                    display_text = self.countobject.display_text(self.job_list[0]["content"], self.job_list[0]["text_width"], 256, current_time)
+                    display_text = self.countobject.display_text(self.job_list[0]["content"], self.job_list[0]["text_width"], 256)
                     self.draw_text(display_text[1],display_text[0])
-                    
+
                 elif(self.job_list[0]["type"] == "img"):
                     display_text = imageviewer.draw_image(self.matrix,self.job_list[0]["content"],self.light_intensity,None)
 
@@ -144,14 +144,19 @@ class RunText(SampleBase):
                 if(display_text[-1] == True or (self.job_list[0]["duration"] > 0 and self.job_started + self.job_list[0]["duration"] < current_time)):
                     self.job_list.pop(0)
                     self.job_started = current_time
-                
+
             else:
-                #Zeit fuer duration fuer naechsten Durchlauf initialisieren
-                self.job_started = current_time
-                self.sleep_time = 0.33
-                # Unser Zaehlobjekt anfragen
-                display_text = self.countobject.count(256,"display")
-                self.draw_text(display_text[1],display_text[0])
+                if(self.countobject.status == "counting" or self.countobject.status == "countdown"):
+                    #Zeit fuer duration fuer naechsten Durchlauf initialisieren
+                    self.job_started = current_time
+                    self.sleep_time = 0.15
+                    # Unser Zaehlobjekt anfragen
+                    display_text = self.countobject.count(256)
+                    self.draw_text(display_text[1],display_text[0])
+
+                elif(self.countobject.status == "failed"):
+                    job_failed = {"type":"text","content":self.countobject.text_failed,"duration":-1,"text_width":self.countobject.text_failed_width}
+                    self.job_list.append(job_failed)
 
             sleep(self.sleep_time)
 

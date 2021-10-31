@@ -1,9 +1,10 @@
 ; Allg. Konfiguration
 ; Datum und Uhrzeit des Zielcounters
 fail_date=2029-07-24 12:00:00
+;fail_date=2021-10-31 14:55:00
 
 ;Text, der nach Ablauf der Uhr permanent angezeigt wird
-text_failed=Klimaziel 1,5 verfehlt
+text_failed=Klimaziel 1,5°C verfehlt.
 
 ; Sleeptime nach Ablauf des Counters (Klimaziel verfehlt)
 ;sleeptime_exp=600
