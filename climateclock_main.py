@@ -126,7 +126,7 @@ class RunText(SampleBase):
                 self.light_color = self.light_color_night.split(",")
 
             #nur hoechstens jede neue sekunde joblist updaten
-            if(current_time > self.job_list_updated):
+            if(current_time == 0 or current_time > self.job_list_updated):
                 self.update_job_list(current_time)
                 self.job_list_updated = current_time
 
