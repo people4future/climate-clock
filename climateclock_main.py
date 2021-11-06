@@ -8,6 +8,7 @@ from datetime import datetime
 import climateclock_util
 from climateclock_counter import Countobject
 import json
+from re import match
 # oder zum Test 'Final Countdown':
 #from climateclock_counter_simulate import Countobject
 import imageviewer
@@ -35,10 +36,16 @@ class RunText(SampleBase):
         with open('jobs.json',"r") as f:
             self.jobs = json.load(f)
 
+        job_count = 0
         for j in self.jobs:
             j["added"] = climateclock_util.get_local_time()
             if(j["type"] == "text"):
                 j["text_width"] = climateclock_util.calculate_text_width(j["content"])
+
+            if(match(r"^((\d\d:)+\d\d)|-1$",j["interval"][0])==None or match(r"^((\d\d:)+\d\d)|-1$",j["interval"][1])==None):
+                print("Error in interval detected in job " + str(job_count) + ". Interval entry will be ignored.")
+                j["interval"] = ["-1","-1"]
+            job_count += 1
 
 
         self.job_list = []
@@ -64,6 +71,7 @@ class RunText(SampleBase):
 
 
     def update_job_list(self,current_time):
+
         for j in self.jobs:
             t = 0
             cron = j["cron"].split(" ")
@@ -74,12 +82,28 @@ class RunText(SampleBase):
                     t += int(cron[1])*60
                 if(cron[2] != "*"):
                     t += int(cron[2])*3600
-            if(t > 0 and current_time%t == 0 and j["added"] != current_time):
 
-                #Falls jobliste zu voll oder der finale countdown laeuft: nicht hinzufuegen
-                if(len(self.job_list) < 20 and self.countobject.status != "countdown"):
-                    self.job_list.append(j)
-                    j["added"] = current_time
+            interval = j["interval"]
+
+            if(interval[0] == "-1"):
+                interval[0] = "00:00:00"
+            if(interval[1] == "-1"):
+                interval[1] = "23:59:59"
+
+            interval_start = [int(i) for i in interval[0].split(":")]
+            interval_stop = [int(i) for i in interval[1].split(":")]
+
+            start_time = interval_start[0]*3600 + interval_start[1]*60 + interval_start[2]
+            stop_time = interval_stop[0]*3600 + interval_stop[1]*60 + interval_stop[2]
+
+            if(current_time >= start_time and current_time <= stop_time):
+
+                if(t > 0 and (current_time-start_time)%t == 0 and j["added"] != current_time):
+
+                    #Falls jobliste zu voll oder der finale countdown laeuft: nicht hinzufuegen
+                    if(len(self.job_list) < 20 and self.countobject.status != "countdown"):
+                        self.job_list.append(j)
+                        j["added"] = current_time
 
     def draw_text(self,pos,text):
         textColor = graphics.Color(int(int(self.light_color[0])*self.light_intensity),int(int(self.light_color[1])*self.light_intensity),int(int(self.light_color[2])*self.light_intensity))
