@@ -1,0 +1,19 @@
+[
+	{"type":"img",
+	"content":"img/stripes_Klimauhr6.jpg",
+	"_content":"img/256 x 32.png",
+	"cron":"* 3 *",
+	"duration":5,
+	"interval":["00:01:00","-1"]},
+	{"type":"text",
+	"content":"Infos unter: www.kiel.de/klimauhr",
+	"cron":"* 3 *",
+	"duration":-1,
+	"interval":["00:02:00","-1"]},
+	{"type":"text",
+	"content":"Verbleibende Zeit für die Einhaltung des 1,5 °C-Ziels:$CLOCK$",
+	"cron":"* 3 *",
+	"duration":-1,
+	"interval":["-1","-1"]}
+
+]
