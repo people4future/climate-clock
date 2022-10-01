@@ -21,7 +21,9 @@ necessary panel driver. This project is based on
 - Adafruit RGB Matrix Bonnet for Raspberry Pi
   https://www.adafruit.com/product/3211
 - 5V 4A (4000mA) power supply (for one panel)
-- SD card 32 GB 
+- Micro SD card 32 GB 
+- Micro SD card reader/writer (in case your computer does not have such reader
+  built in and yo udo not possess such device)
 
 ## Set up Raspberry Pi
 
