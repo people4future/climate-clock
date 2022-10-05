@@ -163,7 +163,7 @@ class RunClock(SampleBase):
         curr_sundown = (self.daylight[1][0] * 3600) +  (self.daylight[1][1] * 60) + self.daylight[1][2]
 
         #'Hello-Screen' displaying clock image on startup
-        self.draw_image("img/stripes_Klimauhr6.jpg",10)
+        self.draw_image("img/Stripes_Klimauhr7.jpg",10)
 
         while True:
 
