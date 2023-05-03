@@ -49,13 +49,63 @@ As Linux user you should be able to read the micro SD card and mount it.
 Open the corresponding device with your file manager or use a terminal and
 switch to the corresponding device directory, e.g., `/media/$USERNAME/$CARD`.
 
-
-
 ## Running the Pi for the first time
+
+To be able to run the Pi and connect to it without having a monitor and keyboard
+connected to the Pi, need a remote login to connect to the Pi and administer it.
+Therefore, you need to set up
+- WIFI
+- ssh service
+
+Mount the micro SD card and put the following file named `wpa_supplicant.conf` to
+the main directory (this is `/media/$USERNAME/$CARD`) on the Pi
+(https://raspberrytips.com/raspberry-pi-wifi-setup/).
+
+```
+country=DE
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+network={
+  ssid="YOURSSID"
+  scan_ssid=1
+  psk="YOURPASSWORD"
+  key_mgmt=WPA-PSK
+}
+```
+
+**Note:**
+- YOURSSID must be the **SSID** of the WIFI network you intend to use
+- YOURPASSWORD must be the **passphrase** of your WIFI
+
+To activate **ssh**, create an empty file ssh in the same directory.
+
+Now unmount and eject the micro SD card and insert it in the Pi for the first time.
+Connect the Pi to a charger or other power source. It will start up and automaticall
+connect to your WIFI. This may take some time.
+
+Most router will provide a random IP-address to the Pi. To find out which IP-address
+this is, consult your router.
+
+Now you cann log in to the Pi with:
+- Linux/Mac `ssh pi@THE_IP_ADDRESS`
+- Windows you might want to use the `putty` client
+
+The system will ask for a password. Usually this is **raspberry**.
+
+After log in, you can continue with **installing dependencies** below.
 
 ## Running the Pi for the first time (with monitor)
 
+Connect a monitor, a keyboard and a power supply to your Pi.
+After it has booted successfully, log in with 
+- Login **pi**
+- Password **raspberry**
+
+Now you should be on command line of the Pi and able to install dependencies.
+
 ## Installing dependencies
+
+
 
 ## Testing Panels (Display)
 
