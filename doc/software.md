@@ -122,6 +122,8 @@ mode.
 
 `$ sudo -s` 
 
+### Set up the system clock
+
 Check the current date on the Pi with
 
 `# date`
@@ -131,28 +133,23 @@ the correct date and time.
 
 `# date -s '16 May 2023 09:28'`
 
-Now we can update the package information on the Pi.
-
-`# apt-get update` 
-
 To avoid future issues with updates, set a time server. Usually, this
 is already set up correctly. However, in some local networks, it might be
 that public time servers are not reachable or you want to use a different
 one than the defaults. In that case:
 
-- Deactivate the time server with
-  timedatectl set-ntp false
-- Add your time server to the configuration file
-  nano /etc/systemd/timesyncd.conf
-- Add a line with FallbackNTP= followed by your time servers
-  FallbackNTP=my.time.server1 my.time.server2
+Deactivate the time server with
+`# timedatectl set-ntp false`
+Add your time server to the configuration file
+`# nano /etc/systemd/timesyncd.conf`
+- Add a line with `FallbackNTP=` followed by your time servers.
+  for example: `FallbackNTP=my.time.server1 my.time.server2`
 - Save the file with Ctrl-O
 - Exit the editor with Ctrl-X
-- Activate the time server again  with
-  timedatectl set-ntp true
-- Check the status
-  timedatectl status
-
+Activate the time server again with
+`# timedatectl set-ntp true`
+Check the status
+`# timedatectl status`
 The result should look like:
 ```
                Local time: Tue 2023-05-16 09:40:33 CEST
@@ -164,36 +161,89 @@ System clock synchronized: yes
           RTC in local TZ: no
 ```
 
+### Install Python development packages
+
+Update the package information on the Pi.
+
+`# apt-get update` 
+
 Now we are able to install updates and new software.
 
-First we need python development tools:
+`# apt-get install python3-dev python3-pillow -y`
 
-sudo apt-get install python3-dev python3-pillow -y
+### Install LED library
 
-git clone https://github.com/hzeller/rpi-rgb-led-matrix.git
+The LED library does not have an installable package, but
+it is relatively easy to compile and install it yourself.
 
-Enter the directory with
+Make sure git is installed with
+`# apt install git`
+`# exit`
 
-cd rpi-rgb-led-matrix
+Get the library form its repository (clone it): 
+`$ git clone https://github.com/hzeller/rpi-rgb-led-matrix.git`
 
-make
+Switch to the directory with
+`$ cd rpi-rgb-led-matrix`
+and build the library
+`$ make`
+Now enter the Python bindings directory so it can be used
+from within Python.
+`$ cd bindings/python`
 
-cd bindings/python
-
-make build-python PYTHON=$(command -v python3)
-make install-python PYTHON=$(command -v python3)
+Build and install the Python stuff with
+`$ make build-python PYTHON=$(command -v python3)`
+`$ sudo -s`
+`# make install-python PYTHON=$(command -v python3)`
 
 ## Testing Panels (Display)
 
+To test your panels, you have to connect them to the Pi. For this documentation
+we assume you already did this following instructions to set up the hardware.
+
+In the checked out repository `rpi-rgb-led-matrix` you find a `README.md`
+containing detailed information to test your setup and play around with the
+panels. In addition there are examples in the `bindings/python` subdirectory.
+It helps to play around with them too, just to see that all installed parts
+work together properly.
+
 ## Installing the clock program
 
-## Configure the clock program
+Lets assume you are logged in as normal user. In case you are not, you can leave
+with
+`# exit`
 
-## Playing with fonts
+Switch back to your home directory
+`$ cd`
+
+Clone the clock repository with
+`$ git clone https://github.com/people4future/climate-clock`
+Switch to the directory
+`$ cd climate-clock`
 
 ## Test the clock program
 
-## Make the clock program start automatically
+how to test run the clock
+
+## Make the clock start automatically
+
+In this directory, you find a scripted called `climate-clock` which is a proper
+init.d start and stop script for the clock. Copy the script to `/etc/init.d`.
+`$ sudo -s`
+`# cp climate-clock /etc/init.d/`
+Make sure the clock is started in the right run levels with
+`# cd ../rc3.d`
+`# ln -s ../init.d/climate-clock S02climate-clock`
+`# cd ../rc6.d`
+`# ln -s ../init.d/climate-clock K01climate-clock`
+
+## Configure the clock program
+
+todo
+
+## Playing with fonts
+
+explain how we created the font
 
 ## References
 
