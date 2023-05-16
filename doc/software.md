@@ -105,21 +105,35 @@ Now you should be on command line of the Pi and able to install dependencies.
 
 ## Installing dependencies
 
-Switch to super user with:
+Before we can install the clock service, here are some dependencies and
+prerequsites to be installed and configured before.
 
-sudo -s
+Things to do:
+- Set up clock
+- Install python development tools
+- Install LED-matrix library
 
-Check date
+For these steps, we better switch to super user mode.
 
-date
+**Note:** Lines prefixed with `$` or `#` indicate command line
+commands, to be typed in the terminal without the prefix. `$` 
+indicates normal terminal/command line mode and `#` super user
+mode.
 
-If it is not the correct date and time, you must change it with
+`$ sudo -s` 
 
-sudo date -s '16 May 2023 09:28'
+Check the current date on the Pi with
 
-Of course with your current local date and time.
+`# date`
 
-apt-get update 
+If it is not the correct date and time, you must change it with using
+the correct date and time.
+
+`# date -s '16 May 2023 09:28'`
+
+Now we can update the package information on the Pi.
+
+`# apt-get update` 
 
 To avoid future issues with updates, set a time server. Usually, this
 is already set up correctly. However, in some local networks, it might be
