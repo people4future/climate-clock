@@ -105,7 +105,69 @@ Now you should be on command line of the Pi and able to install dependencies.
 
 ## Installing dependencies
 
+Switch to super user with:
 
+sudo -s
+
+Check date
+
+date
+
+If it is not the correct date and time, you must change it with
+
+sudo date -s '16 May 2023 09:28'
+
+Of course with your current local date and time.
+
+apt-get update 
+
+To avoid future issues with updates, set a time server. Usually, this
+is already set up correctly. However, in some local networks, it might be
+that public time servers are not reachable or you want to use a different
+one than the defaults. In that case:
+
+- Deactivate the time server with
+  timedatectl set-ntp false
+- Add your time server to the configuration file
+  nano /etc/systemd/timesyncd.conf
+- Add a line with FallbackNTP= followed by your time servers
+  FallbackNTP=my.time.server1 my.time.server2
+- Save the file with Ctrl-O
+- Exit the editor with Ctrl-X
+- Activate the time server again  with
+  timedatectl set-ntp true
+- Check the status
+  timedatectl status
+
+The result should look like:
+```
+               Local time: Tue 2023-05-16 09:40:33 CEST
+           Universal time: Tue 2023-05-16 07:40:33 UTC
+                 RTC time: n/a
+                Time zone: Europe/Berlin (CEST, +0200)
+System clock synchronized: yes
+              NTP service: active
+          RTC in local TZ: no
+```
+
+Now we are able to install updates and new software.
+
+First we need python development tools:
+
+sudo apt-get install python3-dev python3-pillow -y
+
+git clone https://github.com/hzeller/rpi-rgb-led-matrix.git
+
+Enter the directory with
+
+cd rpi-rgb-led-matrix
+
+make
+
+cd bindings/python
+
+make build-python PYTHON=$(command -v python3)
+make install-python PYTHON=$(command -v python3)
 
 ## Testing Panels (Display)
 
